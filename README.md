@@ -6,8 +6,7 @@ Here's a sample `README.md` file for your GitHub Pages project called `fantrax_b
 
 Welcome to the **Fantrax Breakaway Super League** analytics dashboard! This web-based interface provides real-time insights, statistics, and visualizations for players in a fantasy football league. Built for fans, analysts, and team managers, this dashboard makes tracking performance fun and efficient.
 
-> 📍 Hosted at: [fantrax_breakaway_super_league.io]
-> (https://d4nk3nt.github.io/fantrax_breakaway_super_league.io/)
+> 📍 Hosted at: [fantrax_breakaway_super_league.io](https://d4nk3nt.github.io/fantrax_breakaway_super_league.io)
 
 ---
 
