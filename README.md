@@ -1,7 +1,3 @@
-Here's a sample `README.md` file for your GitHub Pages project called `fantrax_breakaway_super_league.io`, based on the provided image of your Football Analytics Dashboard:
-
----
-
 # ⚽ Fantrax Breakaway Super League Dashboard
 
 Welcome to the **Fantrax Breakaway Super League** analytics dashboard! This web-based interface provides real-time insights, statistics, and visualizations for players in a fantasy football league. Built for fans, analysts, and team managers, this dashboard makes tracking performance fun and efficient.
@@ -41,56 +37,6 @@ Welcome to the **Fantrax Breakaway Super League** analytics dashboard! This web-
 * **Status**: Player status within the league (e.g., joester1, CTM).
 * **+/-**: Player performance change (growth/decline).
 
----
-
-## 🚀 How It Works
-
-This project is built using modern web technologies and likely uses a combination of:
-
-* **React / Vue / Svelte** for UI rendering
-* **Chart.js / D3 / ECharts** for visualizations
-* **Fantrax API** or CSV data as the data source (if applicable)
-* **GitHub Pages** for deployment
-
-> Note: If you'd like to contribute or modify the data source, check the `/data` or `/src` folders in the repo.
-
----
-
-## 🧩 Getting Started
-
-### 📦 Clone the Repository
-
-```bash
-git clone https://github.com/yourusername/fantrax_breakaway_super_league.io.git
-cd fantrax_breakaway_super_league.io
-```
-
-### 🛠️ Run Locally (if applicable)
-
-If it's a static site:
-
-```bash
-# Just open index.html
-open index.html
-```
-
-If built with a framework (e.g., React):
-
-```bash
-npm install
-npm start
-```
-
----
-
-## 🌐 Deployment
-
-This project is automatically deployed via **GitHub Pages**. Every push to the `main` branch updates the site at:
-
-```
-https://yourusername.github.io/fantrax_breakaway_super_league.io
-```
-
 > Make sure your repository is public and GitHub Pages is enabled from the settings.
 
 ---
@@ -110,18 +56,7 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ---
 
-## 📄 License
-
-[MIT](LICENSE)
-
----
-
 ## 📬 Contact
 
-Maintained by **[Your Name]**
-Twitter / GitHub: `@yourhandle`
-Email: [your@email.com](mailto:your@email.com)
-
----
-
-Let me know if you’d like the README to include specific tech stack details, live data sources, or embed screenshots!
+Maintained by **[Dan]**
+GitHub: `@d4nk3nt`
