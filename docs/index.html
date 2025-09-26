@@ -298,23 +298,48 @@
     }
     
     function calculateAndRenderImpact() {
-        if (Object.keys(weeklyPlayerData).length === 0 || transactionData.length === 0) { return; }
+        if (Object.keys(weeklyPlayerData).length === 0 || transactionData.length === 0) {
+            console.log("Waiting for data to calculate impact...");
+            return;
+        }
+        
         const impact = {};
         const allTeams = [...new Set(matchData.map(m => m.Team))];
         allTeams.forEach(team => impact[team] = 0);
+
         transactionData.forEach(t => {
             const transactionGW = parseInt(t.Gameweek);
-            if (!transactionGW || !t.Team) return;
+            const teamName = t.Team ? t.Team.trim() : null;
+            const playerName = t.Player ? t.Player.trim().toLowerCase() : null;
+
+            if (!transactionGW || !teamName || !playerName) return;
+
             let actualPoints = 0;
+            // Loop from the week of the transaction to the current week
             for (let gw = transactionGW; gw <= CURRENT_GAMEWEEK; gw++) {
                 const weeklyData = weeklyPlayerData[gw];
                 if (!weeklyData) continue;
-                const playerStats = weeklyData.find(p => p.Player === t.Player);
-                if (playerStats) { actualPoints += parseFloat(playerStats['FPts']) || 0; }
+
+                // Find player with normalized names (trim whitespace, convert to lowercase)
+                const playerStats = weeklyData.find(p => p.Player && p.Player.trim().toLowerCase() === playerName);
+                
+                if (playerStats) {
+                    actualPoints += parseFloat(playerStats['FPts']) || 0;
+                } else {
+                    // This will help you find any data mismatches in your files
+                    console.log(`DEBUG: No match found for player "${t.Player}" in Gameweek ${gw} data.`);
+                }
             }
-            if (t.Type.toLowerCase() === 'add') { impact[t.Team] += actualPoints; } 
-            else if (t.Type.toLowerCase() === 'drop') { impact[t.Team] -= actualPoints; }
+
+            if (impact.hasOwnProperty(teamName)) {
+                if (t.Type.toLowerCase() === 'add') {
+                    impact[teamName] += actualPoints;
+                } else if (t.Type.toLowerCase() === 'drop') {
+                    impact[teamName] -= actualPoints;
+                }
+            }
         });
+
         const sortedImpact = Object.entries(impact).sort(([,a],[,b]) => b - a);
         const impactBody = document.getElementById('impact-analysis-body');
         impactBody.innerHTML = '';
@@ -322,16 +347,26 @@
             const row = document.createElement('tr');
             row.className = 'border-b border-gray-100 dark:border-gray-700';
             const colorClass = netPoints > 0 ? 'text-green-500' : netPoints < 0 ? 'text-red-500' : '';
-            row.innerHTML = `<td class="py-2 font-semibold">${index + 1}</td><td class="py-2">${team}</td><td class="py-2 font-bold ${colorClass}">${netPoints.toFixed(1)}</td>`;
+            row.innerHTML = `
+                <td class="py-2 font-semibold">${index + 1}</td>
+                <td class="py-2">${team}</td>
+                <td class="py-2 font-bold ${colorClass}">${netPoints.toFixed(1)}</td>
+            `;
             impactBody.appendChild(row);
         });
+
         const logBody = document.getElementById('transaction-log-body');
         logBody.innerHTML = '';
         transactionData.forEach(t => {
             const row = document.createElement('tr');
             row.className = 'border-b border-gray-100 dark:border-gray-700';
             const typeClass = t.Type.toLowerCase() === 'add' ? 'text-green-500' : 'text-red-500';
-            row.innerHTML = `<td class="py-2">${t.Player}</td><td class="py-2 font-semibold ${typeClass}">${t.Type}</td><td class="py-2">${t.Team}</td><td class="py-2">${t.Gameweek}</td>`;
+            row.innerHTML = `
+                <td class="py-2">${t.Player}</td>
+                <td class="py-2 font-semibold ${typeClass}">${t.Type}</td>
+                <td class="py-2">${t.Team}</td>
+                <td class="py-2">${t.Gameweek}</td>
+            `;
             logBody.appendChild(row);
         });
     }
