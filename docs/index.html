@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Football Analytics Dashboard | Gridiron Visionary</title>
+  <title>Football Analytics Dashboard</title>
 
-  <!-- Tailwind, Alpine, Feather, Charts, DataTables, PapaParse -->
+  <!-- Tailwind + Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
-  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
@@ -38,10 +38,9 @@
     <table id="players-table" class="display stripe hover w-full text-sm"></table>
   </section>
 
-  <!-- Script to load CSV and populate dashboard -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      Papa.parse("Fantrax-Players-Fantrax Breakaway Super League.csv", {
+      Papa.parse("ref.csv", {
         download: true,
         header: true,
         skipEmptyLines: true,
@@ -53,25 +52,29 @@
 
           // 2. KPI: Top scorer
           let topScorer = data.reduce((a, b) =>
-            parseFloat(a.Pts || 0) > parseFloat(b.Pts || 0) ? a : b
+            parseFloat(a["FPts"] || 0) > parseFloat(b["FPts"] || 0) ? a : b
           );
-          document.getElementById("top-scorer-name").innerText = topScorer.Player;
-          document.getElementById("top-scorer-pts").innerText = `${topScorer.Pts} FPts`;
+          document.getElementById("top-scorer-name").innerText = topScorer["Player"];
+          document.getElementById("top-scorer-pts").innerText = `${topScorer["FPts"]} FPts`;
 
-          // 3. KPI: Average points
+          // 3. KPI: Average FPts
           let avgPts = (
-            data.reduce((sum, p) => sum + parseFloat(p.Pts || 0), 0) / data.length
+            data.reduce((sum, p) => sum + parseFloat(p["FPts"] || 0), 0) / data.length
           ).toFixed(1);
           document.getElementById("avg-points").innerText = avgPts;
 
-          // 4. DataTable of players
+          // 4. DataTable
           const tableData = data.map(p => [
-            p.Player,
-            p.Team,
-            p.Position,
-            p.Pts,
-            p.FPPG || "-", // Fantasy points per game (if exists)
-            p.Status || "-"
+            p["Player"],
+            p["Team"],
+            p["Position"],
+            p["RkOv"],
+            p["Status"],
+            p["Opponent"],
+            p["FPts"],
+            p["FP/G"],
+            p["Ros"],
+            p["+/-"]
           ]);
 
           $('#players-table').DataTable({
@@ -80,10 +83,15 @@
               { title: "Player" },
               { title: "Team" },
               { title: "Position" },
-              { title: "Pts" },
-              { title: "FPPG" },
-              { title: "Status" }
-            ]
+              { title: "RkOv" },
+              { title: "Status" },
+              { title: "Opponent" },
+              { title: "FPts" },
+              { title: "FP/G" },
+              { title: "Ros" },
+              { title: "+/-" }
+            ],
+            pageLength: 10
           });
         }
       });
