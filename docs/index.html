@@ -1,1 +1,95 @@
-<meta http-equiv="refresh" content="0; url=dummy_dash.html">
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Football Analytics Dashboard | Gridiron Visionary</title>
+
+  <!-- Tailwind, Alpine, Feather, Charts, DataTables, PapaParse -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+  <!-- KPI Cards -->
+  <section id="overview" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <p class="text-gray-500 dark:text-gray-400 text-sm">Total Players</p>
+      <h2 id="total-players" class="text-3xl font-bold">0</h2>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <p class="text-gray-500 dark:text-gray-400 text-sm">Top Scorer</p>
+      <h2 id="top-scorer-name" class="text-xl font-bold">Loading...</h2>
+      <p id="top-scorer-pts" class="text-sm">-- FPts</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+      <p class="text-gray-500 dark:text-gray-400 text-sm">Avg. Points</p>
+      <h2 id="avg-points" class="text-3xl font-bold">0</h2>
+    </div>
+  </section>
+
+  <!-- Player Statistics Table -->
+  <section class="p-6">
+    <table id="players-table" class="display stripe hover w-full text-sm"></table>
+  </section>
+
+  <!-- Script to load CSV and populate dashboard -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      Papa.parse("Fantrax-Players-Fantrax Breakaway Super League.csv", {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          const data = results.data;
+
+          // 1. KPI: Total players
+          document.getElementById("total-players").innerText = data.length;
+
+          // 2. KPI: Top scorer
+          let topScorer = data.reduce((a, b) =>
+            parseFloat(a.Pts || 0) > parseFloat(b.Pts || 0) ? a : b
+          );
+          document.getElementById("top-scorer-name").innerText = topScorer.Player;
+          document.getElementById("top-scorer-pts").innerText = `${topScorer.Pts} FPts`;
+
+          // 3. KPI: Average points
+          let avgPts = (
+            data.reduce((sum, p) => sum + parseFloat(p.Pts || 0), 0) / data.length
+          ).toFixed(1);
+          document.getElementById("avg-points").innerText = avgPts;
+
+          // 4. DataTable of players
+          const tableData = data.map(p => [
+            p.Player,
+            p.Team,
+            p.Position,
+            p.Pts,
+            p.FPPG || "-", // Fantasy points per game (if exists)
+            p.Status || "-"
+          ]);
+
+          $('#players-table').DataTable({
+            data: tableData,
+            columns: [
+              { title: "Player" },
+              { title: "Team" },
+              { title: "Position" },
+              { title: "Pts" },
+              { title: "FPPG" },
+              { title: "Status" }
+            ]
+          });
+        }
+      });
+
+      feather.replace();
+    });
+  </script>
+</body>
+</html>
