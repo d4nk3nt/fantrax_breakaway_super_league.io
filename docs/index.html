@@ -172,6 +172,39 @@
     const teamColors = { "Book Ake": "#4299E1", "Bryan MBeumboclaat": "#E53E3E", "Chicken Tikka MoSalah": "#38A169", "Ekitiki-taka": "#ECC94B", "ESRs EDL for FPL": "#9F7AEA", "FPL Loyalists": "#ED8936", "Haile Senesi": "#3182CE", "I'm a Baleba": "#D53F8C", "Infantino Milan": "#4FD1C5", "Iwobi Wan-Kenobi": "#F6AD55", "Me,Myself,Ndiaye": "#805AD5", "Texas Chainshaw Massacre": "#2C7A7B", "Ugarte roll with it": "#A0AEC0" };
     function getTeamColor(teamName) { return teamColors[teamName] || '#9CA3AF'; }
 
+    // --- ADDED: Self-contained sample data for testing ---
+    const sampleTransactionData = [
+        { Gameweek: '5', Player: 'James Hill', Type: 'Add', Team: 'Book Ake' },
+        { Gameweek: '5', Player: 'Quilindschy Hartman', Type: 'Drop', Team: 'Book Ake' },
+        { Gameweek: '4', Player: 'Marco Bizot', Type: 'Add', Team: 'FPL Loyalists' },
+        { Gameweek: '4', Player: 'Lucas Bergvall', Type: 'Drop', Team: 'FPL Loyalists' },
+        { Gameweek: '3', Player: 'Ivan Toney', Type: 'Add', Team: 'Chicken Tikka MoSalah' },
+        { Gameweek: '3', Player: 'Kaoru Mitoma', Type: 'Drop', Team: 'Chicken Tikka MoSalah' },
+    ];
+
+    const sampleWeeklyPlayerData = {
+        '1': [],
+        '2': [],
+        '3': [
+            { Player: 'Ivan Toney', FPts: '12.5', Team: 'BRE', Position: 'FWD' },
+            { Player: 'Kaoru Mitoma', FPts: '3.0', Team: 'BHA', Position: 'MID' },
+        ],
+        '4': [
+            { Player: 'Marco Bizot', FPts: '8.0', Team: 'BRE', Position: 'GKP' },
+            { Player: 'Lucas Bergvall', FPts: '1.0', Team: 'TOT', Position: 'MID' },
+            { Player: 'Ivan Toney', FPts: '5.0', Team: 'BRE', Position: 'FWD' },
+            { Player: 'Kaoru Mitoma', FPts: '7.5', Team: 'BHA', Position: 'MID' },
+        ],
+        '5': [
+            { Player: 'James Hill', FPts: '6.5', Team: 'BOU', Position: 'DEF' },
+            { Player: 'Quilindschy Hartman', FPts: '2.0', Team: 'FA', Position: 'DEF' },
+            { Player: 'Marco Bizot', FPts: '5.0', Team: 'BRE', Position: 'GKP' },
+            { Player: 'Lucas Bergvall', FPts: '0.5', Team: 'TOT', Position: 'MID' },
+            { Player: 'Ivan Toney', FPts: '9.0', Team: 'BRE', Position: 'FWD' },
+            { Player: 'Kaoru Mitoma', FPts: '2.5', Team: 'BHA', Position: 'MID' },
+        ]
+    };
+
     const matchRecordsCSV = `Gameweek,Start_Date,End_Date,Team,Score,Opponent,Opp_Score,Result
 1,Fri Aug 15 2025,Thu Aug 21 2025,FPL Loyalists,116.5,"Me,Myself,Ndiaye",107.75,W
 1,Fri Aug 15 2025,Thu Aug 21 2025,"Me,Myself,Ndiaye",107.75,FPL Loyalists,116.5,L
@@ -254,7 +287,7 @@
       const activeBtn = document.querySelector(`[data-section="${sectionName}"]`);
       activeBtn.classList.add('text-blue-600', 'dark:text-blue-400', 'border-b-2', 'border-blue-600', 'dark:border-blue-400');
       activeBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
-      if (sectionName === 'league' && Object.keys(charts).length === 0) { // Only init charts once
+      if (sectionName === 'league' && Object.keys(charts).length === 0) {
           setTimeout(initializeCharts, 100); 
       }
     }
@@ -315,20 +348,11 @@
             if (!transactionGW || !teamName || !playerName) return;
 
             let actualPoints = 0;
-            // Loop from the week of the transaction to the current week
             for (let gw = transactionGW; gw <= CURRENT_GAMEWEEK; gw++) {
                 const weeklyData = weeklyPlayerData[gw];
                 if (!weeklyData) continue;
-
-                // Find player with normalized names (trim whitespace, convert to lowercase)
                 const playerStats = weeklyData.find(p => p.Player && p.Player.trim().toLowerCase() === playerName);
-                
-                if (playerStats) {
-                    actualPoints += parseFloat(playerStats['FPts']) || 0;
-                } else {
-                    // This will help you find any data mismatches in your files
-                    console.log(`DEBUG: No match found for player "${t.Player}" in Gameweek ${gw} data.`);
-                }
+                if (playerStats) { actualPoints += parseFloat(playerStats['FPts']) || 0; }
             }
 
             if (impact.hasOwnProperty(teamName)) {
@@ -347,26 +371,16 @@
             const row = document.createElement('tr');
             row.className = 'border-b border-gray-100 dark:border-gray-700';
             const colorClass = netPoints > 0 ? 'text-green-500' : netPoints < 0 ? 'text-red-500' : '';
-            row.innerHTML = `
-                <td class="py-2 font-semibold">${index + 1}</td>
-                <td class="py-2">${team}</td>
-                <td class="py-2 font-bold ${colorClass}">${netPoints.toFixed(1)}</td>
-            `;
+            row.innerHTML = `<td class="py-2 font-semibold">${index + 1}</td><td class="py-2">${team}</td><td class="py-2 font-bold ${colorClass}">${netPoints.toFixed(1)}</td>`;
             impactBody.appendChild(row);
         });
-
         const logBody = document.getElementById('transaction-log-body');
         logBody.innerHTML = '';
         transactionData.forEach(t => {
             const row = document.createElement('tr');
             row.className = 'border-b border-gray-100 dark:border-gray-700';
             const typeClass = t.Type.toLowerCase() === 'add' ? 'text-green-500' : 'text-red-500';
-            row.innerHTML = `
-                <td class="py-2">${t.Player}</td>
-                <td class="py-2 font-semibold ${typeClass}">${t.Type}</td>
-                <td class="py-2">${t.Team}</td>
-                <td class="py-2">${t.Gameweek}</td>
-            `;
+            row.innerHTML = `<td class="py-2">${t.Player}</td><td class="py-2 font-semibold ${typeClass}">${t.Type}</td><td class="py-2">${t.Team}</td><td class="py-2">${t.Gameweek}</td>`;
             logBody.appendChild(row);
         });
     }
@@ -406,7 +420,7 @@
     function createPerformanceMatrixChart() { charts.performanceMatrix = createChart('performance-matrix-chart', 'scatter', { responsive: true, plugins: { legend: { labels: { color: '#9CA3AF' } } }, scales: { x: { title: { display: true, text: 'Average Score', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }, y: { title: { display: true, text: 'Win Rate (%)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } } } }); }
     
     function updateLeagueView() {
-      if(Object.keys(charts).length === 0) return; // Don't update if charts aren't initialized
+      if(Object.keys(charts).length === 0) return;
       const selectedTeams = Array.from(document.querySelectorAll('#team-checkboxes input[type="checkbox"]:checked')).map(cb => cb.value);
       updateScoreLineChart(selectedTeams);
       updateWinTrendsChart(selectedTeams);
@@ -477,62 +491,73 @@
       charts.performanceMatrix.update();
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        parseMatchData();
-        
-        const filesToLoad = ['transactions.csv'];
-        for (let i = 1; i <= CURRENT_GAMEWEEK; i++) { filesToLoad.push(`ref_gw${i}.csv`); }
+document.addEventListener("DOMContentLoaded", () => {
+    parseMatchData();
+    
+    // --- MODIFIED: Set the first gameweek you have data for ---
+    const START_GAMEWEEK = 4;
+    
+    const filesToLoad = ['transactions.csv'];
+    // Loop only from the start week to the current week
+    for (let i = START_GAMEWEEK; i <= CURRENT_GAMEWEEK; i++) { 
+        filesToLoad.push(`ref_gw${i}.csv`); 
+    }
 
-        const promises = filesToLoad.map(file => new Promise((resolve) => {
-            Papa.parse(file, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: results => resolve({ file, status: 'fulfilled', data: results.data }),
-                error: (err, file) => resolve({ file, status: 'rejected', error: err }) // Resolve instead of reject
-            });
-        }));
-
-        Promise.all(promises).then(results => {
-            const transactionResult = results[0];
-            if (transactionResult.status === 'fulfilled') { transactionData = transactionResult.data; } 
-            else {
-                console.error("CRITICAL: transactions.csv failed to load.");
-                document.getElementById('impact-analysis-body').innerHTML = `<tr><td colspan="3" class="text-red-500 py-4">Error: Could not load transactions.csv.</td></tr>`;
-            }
-
-            weeklyPlayerData = {};
-            for (let i = 1; i <= CURRENT_GAMEWEEK; i++) {
-                const weeklyResult = results[i];
-                if (weeklyResult.status === 'fulfilled') { weeklyPlayerData[i] = weeklyResult.data; } 
-                else { console.warn(`Could not load ref_gw${i}.csv. It will be skipped.`); }
-            }
-            console.log("Data loading finished.");
-
-            const latestPlayerData = weeklyPlayerData[CURRENT_GAMEWEEK] || [];
-            
-            if (latestPlayerData.length > 0) {
-                document.getElementById('player-stats-title').innerText = `Player Statistics (Gameweek ${CURRENT_GAMEWEEK})`;
-                document.getElementById("total-players").innerText = latestPlayerData.length;
-                const topScorer = latestPlayerData.reduce((a, b) => (parseFloat(a["FPts"] || 0) > parseFloat(b["FPts"] || 0)) ? a : b, { Player: 'N/A', FPts: 0 });
-                document.getElementById("top-scorer-name").innerText = topScorer["Player"];
-                document.getElementById("top-scorer-pts").innerText = `${topScorer["FPts"]} FPts`;
-                const avgPts = (latestPlayerData.reduce((sum, p) => sum + parseFloat(p["FPts"] || 0), 0) / latestPlayerData.length || 0).toFixed(1);
-                document.getElementById("avg-points").innerText = avgPts;
-
-                if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().destroy(); }
-                $('#players-table').DataTable({
-                    data: latestPlayerData,
-                    columns: Object.keys(latestPlayerData[0]).map(k => ({ title: k, data: k })),
-                    pageLength: 15, order: [[6, 'desc']], responsive: true, dom: 'Bfrtip',
-                    language: { search: "Search players:", lengthMenu: "Show _MENU_ players", info: "Showing _START_ to _END_ of _TOTAL_ players" }
-                });
-            } else {
-                 document.getElementById('player-stats-title').innerText = `Player Statistics (Data Unavailable for GW${CURRENT_GAMEWEEK})`;
-            }
-            calculateAndRenderImpact();
+    const promises = filesToLoad.map(file => new Promise((resolve) => {
+        Papa.parse(file, {
+            download: true, header: true, skipEmptyLines: true,
+            complete: results => resolve({ file, status: 'fulfilled', data: results.data }),
+            error: (err) => resolve({ file, status: 'rejected', error: err })
         });
-      
+    }));
+
+    Promise.all(promises).then(results => {
+        const transactionResult = results[0];
+        if (transactionResult.status === 'fulfilled') {
+            transactionData = transactionResult.data;
+        } else {
+            console.error("CRITICAL: transactions.csv failed to load.");
+            document.getElementById('impact-analysis-body').innerHTML = `<tr><td colspan="3" class="text-red-500 py-4">Error: Could not load transactions.csv.</td></tr>`;
+        }
+
+        weeklyPlayerData = {};
+        results.slice(1).forEach(result => {
+            if (result.status === 'fulfilled') {
+                // Extract gameweek number from filename e.g., "ref_gw4.csv" -> 4
+                const gw = result.file.match(/_gw(\d+)/)[1];
+                weeklyPlayerData[gw] = result.data;
+            } else {
+                console.warn(`Could not load ${result.file}. It will be skipped.`);
+            }
+        });
+        console.log("Data loading finished.");
+
+        const latestPlayerData = weeklyPlayerData[CURRENT_GAMEWEEK] || [];
+        
+        if (latestPlayerData.length > 0) {
+            document.getElementById('player-stats-title').innerText = `Player Statistics (Gameweek ${CURRENT_GAMEWEEK})`;
+            document.getElementById("total-players").innerText = latestPlayerData.length;
+            const topScorer = latestPlayerData.reduce((a, b) => (parseFloat(a["FPts"] || 0) > parseFloat(b["FPts"] || 0)) ? a : b, { Player: 'N/A', FPts: 0 });
+            document.getElementById("top-scorer-name").innerText = topScorer["Player"];
+            document.getElementById("top-scorer-pts").innerText = `${topScorer["FPts"]} FPts`;
+            const avgPts = (latestPlayerData.reduce((sum, p) => sum + parseFloat(p["FPts"] || 0), 0) / latestPlayerData.length || 0).toFixed(1);
+            document.getElementById("avg-points").innerText = avgPts;
+
+            if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().destroy(); }
+            $('#players-table').DataTable({
+                data: latestPlayerData,
+                columns: Object.keys(latestPlayerData[0]).map(k => ({ title: k, data: k })),
+                pageLength: 15, order: [[6, 'desc']], responsive: true, dom: 'Bfrtip',
+                language: { search: "Search players:", lengthMenu: "Show _MENU_ players", info: "Showing _START_ to _END_ of _TOTAL_ players" }
+            });
+        } else {
+             document.getElementById('player-stats-title').innerText = `Player Statistics (Data Unavailable for GW${CURRENT_GAMEWEEK})`;
+        }
+        
+        calculateAndRenderImpact();
         showSection('league');
     });
+});
   </script>
 
   <style>
