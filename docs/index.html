@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Football Analytics Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+  <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-4">
+    <div class="flex space-x-8 items-center">
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Analytics Dashboard</h1>
+      <div class="flex space-x-6">
+        <button onclick="showSection('league')" class="nav-btn text-lg font-semibold text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1" data-section="league">
+          League
+        </button>
+        <button onclick="showSection('players')" class="nav-btn text-lg font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" data-section="players">
+          Players
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="loading-message" class="p-8 text-center text-gray-500">Loading all data...</div>
+  
+  <div id="main-content" class="hidden">
+    <section id="league-section" class="section-content">
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Latest Gameweek</p>
+                    <h2 id="current-gameweek" class="text-3xl font-bold">5</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 pt-0">
+        <div class="mb-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-semibold mb-4">Select Teams to Highlight</h3>
+            <div id="team-checkboxes" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="score-chart-title" class="text-lg font-semibold">Score Trends by Gameweek</h3>
+                    <select id="score-chart-selector" onchange="updateLeagueView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value="weekly" selected>Weekly Score</option>
+                        <option value="cumulative">Cumulative Score</option>
+                    </select>
+                </div>
+                <canvas id="score-trends-chart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="win-trends-title" class="text-lg font-semibold">Cumulative Wins</h3>
+                    <select id="win-trends-selector" onchange="updateLeagueView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value="cumulative" selected>Cumulative Wins</option>
+                        <option value="result">Match Result</option>
+                    </select>
+                </div>
+                <canvas id="win-trends-chart" width="400" height="300"></canvas>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-semibold mb-4">Win Rate by Team</h3>
+            <canvas id="win-rate-chart" width="400" height="300"></canvas>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <h3 class="text-lg font-semibold mb-4">Team Performance Matrix</h3>
+                <canvas id="performance-matrix-chart" width="800" height="400"></canvas>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-xl font-bold mb-4">League Standings</h3>
+            <div class="overflow-x-auto">
+            <table id="standings-table" class="w-full text-sm">
+                <thead>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <th class="text-left py-2">Pos</th>
+                    <th class="text-left py-2">Team</th>
+                    <th class="text-left py-2">W</th>
+                    <th class="text-left py-2">L</th>
+                    <th class="text-left py-2">Points For</th>
+                    <th class="text-left py-2">Points Against</th>
+                    <th class="text-left py-2">Avg Score</th>
+                </tr>
+                </thead>
+                <tbody id="standings-body">
+                </tbody>
+            </table>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <section id="players-section" class="section-content hidden">
+        <div class="p-6 pb-2">
+            <div class="flex items-center space-x-4 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 max-w-sm">
+                <label for="gameweek-selector" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Gameweek:</label>
+                <select id="gameweek-selector" onchange="updatePlayerView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                </select>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <p class="text-gray-500 dark:text-gray-400 text-sm">Total Players</p>
+                    <h2 id="total-players" class="text-3xl font-bold">0</h2>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <p id="top-scorer-label" class="text-gray-500 dark:text-gray-400 text-sm">Top Scorer (Selected GW)</p>
+                    <h2 id="top-scorer-name" class="text-xl font-bold">Loading...</h2>
+                    <p id="top-scorer-pts" class="text-sm">-- FPts</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <p id="avg-points-label" class="text-gray-500 dark:text-gray-400 text-sm">Avg. Points (Selected GW)</p>
+                    <h2 id="avg-points" class="text-3xl font-bold">0</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Cumulative Transaction Impact</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Net points impact from all transactions calculated up to the selected gameweek.</p>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                <th class="text-left py-2">Rank</th>
+                                <th class="text-left py-2">Team</th>
+                                <th class="text-left py-2">Net Points Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cumulative-impact-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Immediate Impact Analysis (Selected GW)</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Net points from claims/drops made for the selected gameweek.</p>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                <th class="text-left py-2">Rank</th>
+                                <th class="text-left py-2">Team</th>
+                                <th class="text-left py-2">Net Points Impact</th>
+                            </tr>
+                        </thead>
+                        <tbody id="immediate-impact-body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Overall Roster Impact (Selected GW)</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Total points scored by the final roster for the selected gameweek, based on all prior transactions.</p>
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                <th class="text-left py-2">Rank</th>
+                                <th class="text-left py-2">Team</th>
+                                <th class="text-left py-2">Total Roster Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overall-impact-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Recent Transactions</h3>
+                    <div class="overflow-y-auto h-64">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-2">Player</th>
+                                    <th class="text-left py-2">Type</th>
+                                    <th class="text-left py-2">Team</th>
+                                    <th class="text-left py-2">GW</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaction-log-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 id="player-stats-title" class="text-xl font-bold">Player Statistics</h3>
+                    <select id="player-stats-selector" onchange="updatePlayerView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value="weekly" selected>Selected Gameweek</option>
+                        <option value="total">Season Total</option>
+                    </select>
+                </div>
+                <table id="players-table" class="display stripe hover w-full text-sm"></table>
+            </div>
+        </div>
+    </section>
+  </div>
+
+<script>
+    let matchData = [], transactionData = [], weeklyPlayerData = {}, seasonTotalPlayerData = [], charts = {};
+    let detailedImpactData = {};
+    let cumulativeDetailedImpactData = {};
+    let teamMappings = {};
+    const MAX_GAMEWEEK = 5;
+    const teamColors = { "Book Ake": "#4299E1", "Bryan MBeumboclaat": "#E53E3E", "Chicken Tikka MoSalah": "#38A169", "Ekitiki-taka": "#ECC94B", "ESRs EDL for FPL": "#9F7AEA", "FPL Loyalists": "#ED8936", "Haile Senesi": "#3182CE", "I’m a Baleba": "#D53F8C", "Infantino Milan": "#4FD1C5", "Iwobi Wan-Kenobi": "#F6AD55", "Me,Myself,Ndiaye": "#805AD5", "Texas Chainshaw Massacre": "#2C7A7B", "Ugarte roll with it": "#A0AEC0" };
+    function getTeamColor(teamName) { return teamColors[teamName] || '#9CA3AF'; }
+
+    function showSection(sectionName) {
+      document.querySelectorAll('.section-content').forEach(section => section.classList.add('hidden'));
+      document.getElementById(sectionName + '-section').classList.remove('hidden');
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-blue-600', 'dark:text-blue-400', 'border-b-2', 'border-blue-600', 'dark:border-blue-400');
+        btn.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-gray-800', 'dark:hover:text-gray-200');
+      });
+      const activeBtn = document.querySelector(`[data-section="${sectionName}"]`);
+      activeBtn.classList.add('text-blue-600', 'dark:text-blue-400', 'border-b-2', 'border-blue-600', 'dark:border-blue-400');
+      activeBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
+      if (sectionName === 'league' && Object.keys(charts).length === 0) {
+          setTimeout(initializeCharts, 100); 
+      }
+    }
+
+    function calculateStandings() {
+      const teamStats = {};
+      matchData.forEach(match => {
+        const team = match.Team;
+        if (!teamStats[team]) { teamStats[team] = { wins: 0, losses: 0, pointsFor: 0, pointsAgainst: 0, games: 0 }; }
+        teamStats[team].games++;
+        teamStats[team].pointsFor += parseFloat(match.Score);
+        teamStats[team].pointsAgainst += parseFloat(match.Opp_Score);
+        if (match.Result === 'W') teamStats[team].wins++; else teamStats[team].losses++;
+      });
+      return Object.entries(teamStats).map(([team, stats]) => ({
+        team, wins: stats.wins, losses: stats.losses, pointsFor: stats.pointsFor.toFixed(1),
+        pointsAgainst: stats.pointsAgainst.toFixed(1), avgScore: (stats.pointsFor / stats.games).toFixed(1)
+      })).sort((a, b) => {
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        return parseFloat(b.avgScore) - parseFloat(a.avgScore);
+      });
+    }
+    
+    function renderStandings(selectedTeams) {
+        if (matchData.length === 0) return;
+        const fullStandings = calculateStandings();
+        const tbody = document.getElementById('standings-body');
+        tbody.innerHTML = '';
+        
+        fullStandings.forEach((team, index) => {
+            const isSelected = selectedTeams.includes(team.team);
+            const row = document.createElement('tr');
+            row.className = `border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${isSelected ? 'bg-blue-500/10 dark:bg-blue-400/10' : ''}`;
+            row.innerHTML = `<td class="py-2 font-semibold">${index + 1}</td><td class="py-2">${team.team}</td><td class="py-2 text-green-600 font-semibold">${team.wins}</td><td class="py-2 text-red-600 font-semibold">${team.losses}</td><td class="py-2">${team.pointsFor}</td><td class="py-2">${team.pointsAgainst}</td><td class="py-2 font-semibold">${team.avgScore}</td>`;
+            tbody.appendChild(row);
+        });
+    }
+
+
+    function createTeamCheckboxes() {
+      if (matchData.length === 0) return;
+      const teams = [...new Set(matchData.map(match => match.Team))].sort();
+      const container = document.getElementById('team-checkboxes');
+      container.innerHTML = '';
+      teams.forEach((team, index) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center space-x-2';
+        const isChecked = index < 4 ? 'checked' : ''; 
+        div.innerHTML = `<input type="checkbox" id="team-${index}" value="${team}" ${isChecked} onchange="updateLeagueView()" class="rounded text-blue-600"><label for="team-${index}" class="text-sm truncate">${team}</label>`;
+        container.appendChild(div);
+      });
+    }
+
+    function initializeCharts() {
+      if (Object.keys(charts).length === 0) {
+        createScoreTrendsChart();
+        createWinTrendsChart();
+        createWinRateChart();
+        createPerformanceMatrixChart();
+      }
+      createTeamCheckboxes();
+      updateLeagueView();
+    }
+
+    function createChart(id, type, options) {
+        const ctx = document.getElementById(id).getContext('2d');
+        return new Chart(ctx, { type, data: { labels: [], datasets: [] }, options });
+    }
+
+    function createScoreTrendsChart() { charts.scoreTrends = createChart('score-trends-chart', 'line', { responsive: true, plugins: { legend: { labels: { color: '#9CA3AF' } } }, scales: { x: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }, y: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } } } }); }
+    function createWinTrendsChart() { charts.winTrends = createChart('win-trends-chart', 'line', { responsive: true, plugins: { legend: { labels: { color: '#9CA3AF' } } }, scales: { x: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }, y: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } } } }); }
+    function createWinRateChart() { charts.winRate = createChart('win-rate-chart', 'doughnut', { responsive: true, plugins: { legend: { position: 'right', labels: { color: '#9CA3AF' } } } }); }
+    function createPerformanceMatrixChart() { 
+        charts.performanceMatrix = createChart('performance-matrix-chart', 'scatter', { 
+            responsive: true, 
+            plugins: { 
+                legend: { labels: { color: '#9CA3AF' } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.dataset.label || '';
+                            const avgScore = context.parsed.x.toFixed(1);
+                            const winRate = context.parsed.y.toFixed(1);
+                            return `${label}: (Avg Score: ${avgScore}, Win Rate: ${winRate}%)`;
+                        }
+                    }
+                }
+            }, 
+            scales: { 
+                x: { title: { display: true, text: 'Average Score', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }, 
+                y: { title: { display: true, text: 'Win Rate (%)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } } 
+            } 
+        }); 
+    }
+    
+    function updateLeagueView() {
+      if(Object.keys(charts).length === 0) return;
+      const selectedTeams = Array.from(document.querySelectorAll('#team-checkboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+      updateScoreLineChart(selectedTeams);
+      updateWinTrendsChart(selectedTeams);
+      updateWinRateChart(selectedTeams);
+      updatePerformanceMatrixChart(selectedTeams);
+      renderStandings(selectedTeams);
+    }
+    
+    function updateScoreLineChart(selectedTeams) {
+        const chartType = document.getElementById('score-chart-selector').value;
+        document.getElementById('score-chart-title').innerText = chartType === 'weekly' ? 'Score Trends by Gameweek' : 'Cumulative Score Trends';
+        const gameweeks = [...new Set(matchData.map(match => parseInt(match.Gameweek)))].sort((a, b) => a - b);
+        let datasets = [];
+        if (chartType === 'weekly') {
+            datasets = selectedTeams.map(team => ({ label: team, data: gameweeks.map(gw => (matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw) || {}).Score || null), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.4 }));
+        } else {
+            datasets = selectedTeams.map(team => {
+                let cumulativeScore = 0;
+                return { label: team, data: gameweeks.map(gw => { cumulativeScore += parseFloat((matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw) || {}).Score || 0); return cumulativeScore.toFixed(2); }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.4 };
+            });
+        }
+        charts.scoreTrends.data = { labels: gameweeks.map(gw => `GW${gw}`), datasets };
+        charts.scoreTrends.update();
+    }
+    
+    function updateWinTrendsChart(selectedTeams) {
+        const chartType = document.getElementById('win-trends-selector').value;
+        document.getElementById('win-trends-title').innerText = chartType === 'cumulative' ? 'Cumulative Wins by Gameweek' : 'Match Results by Gameweek';
+        const gameweeks = [...new Set(matchData.map(match => parseInt(match.Gameweek)))].sort((a, b) => a - b);
+        let datasets = [], yAxisOptions = { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } };
+        if (chartType === 'cumulative') {
+            yAxisOptions.ticks.stepSize = 1;
+            datasets = selectedTeams.map(team => {
+                let winCount = 0;
+                return { label: team, data: gameweeks.map(gw => { const match = matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw); if (match && match.Result === 'W') winCount++; return winCount; }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.1, stepped: true };
+            });
+        } else {
+            yAxisOptions.ticks = { color: '#9CA3AF', stepSize: 1, callback: v => (v === 1 ? 'Win' : v === 0 ? 'Loss' : null) };
+            yAxisOptions.min = -0.1; yAxisOptions.max = 1.1;
+            datasets = selectedTeams.map(team => ({ label: team, data: gameweeks.map(gw => { const match = matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw); return match ? (match.Result === 'W' ? 1 : 0) : null; }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', stepped: true }));
+        }
+        charts.winTrends.options.scales.y = yAxisOptions;
+        charts.winTrends.data = { labels: gameweeks.map(gw => `GW${gw}`), datasets };
+        charts.winTrends.update();
+    }
+    
+    function updateWinRateChart(selectedTeams) {
+      const winRates = selectedTeams.map(team => {
+        const teamMatches = matchData.filter(match => match.Team === team);
+        const wins = teamMatches.filter(match => match.Result === 'W').length;
+        return teamMatches.length > 0 ? ((wins / teamMatches.length) * 100).toFixed(1) : 0;
+      });
+      charts.winRate.data.labels = selectedTeams;
+      charts.winRate.data.datasets[0] = { data: winRates, backgroundColor: selectedTeams.map(team => getTeamColor(team)) };
+      charts.winRate.update();
+    }
+    
+    function updatePerformanceMatrixChart(selectedTeams) {
+      const datasets = selectedTeams.map(team => {
+        const teamMatches = matchData.filter(match => match.Team === team);
+        if (teamMatches.length === 0) return {};
+        const avgScore = teamMatches.reduce((sum, match) => sum + parseFloat(match.Score), 0) / teamMatches.length;
+        const wins = teamMatches.filter(match => match.Result === 'W').length;
+        const winRate = (wins / teamMatches.length) * 100;
+        return { label: team, data: [{ x: avgScore, y: winRate }], backgroundColor: getTeamColor(team), pointRadius: 8 };
+      });
+      charts.performanceMatrix.data.datasets = datasets;
+      charts.performanceMatrix.update();
+    }
+
+    function populateGameweekSelector() {
+        const selector = document.getElementById('gameweek-selector');
+        selector.innerHTML = '';
+        const availableGameweeks = Object.keys(weeklyPlayerData).sort((a,b) => b-a);
+        if (availableGameweeks.length === 0) {
+            selector.innerHTML = `<option>No Data</option>`;
+            return;
+        }
+        availableGameweeks.forEach(gw => {
+            const option = document.createElement('option');
+            option.value = gw;
+            option.textContent = `Gameweek ${gw}`;
+            selector.appendChild(option);
+        });
+    }
+
+    function calculateSeasonTotals() {
+        const playerTotals = {};
+        const numericColumns = ['FPts', 'GP', 'GS', 'Min', 'G', 'KP', 'AT', 'SOT', 'TklW', 'DIS', 'YC', 'RC', 'Pen', 'ACNC', 'Int', 'CLR', 'OG', 'CS', 'AER', 'SBON', 'SBCF', 'PKM', 'PKD', 'GA', 'GC', 'S'];
+        Object.values(weeklyPlayerData).forEach(weeklyData => {
+            weeklyData.forEach(player => {
+                const name = player.Player;
+                if (!playerTotals[name]) {
+                    playerTotals[name] = { ...player };
+                    numericColumns.forEach(col => playerTotals[name][col] = 0);
+                }
+                numericColumns.forEach(col => {
+                    const value = parseFloat(player[col]);
+                    if (!isNaN(value)) { playerTotals[name][col] += value; }
+                });
+            });
+        });
+        Object.values(playerTotals).forEach(player => {
+            if (player.GP > 0) { player['FP/G'] = (player.FPts / player.GP).toFixed(1); } else { player['FP/G'] = 0; }
+        });
+        return Object.values(playerTotals);
+    }
+
+    function calculateAndRenderImmediateGWImpact(targetGW) {
+        if (Object.keys(weeklyPlayerData).length === 0 || transactionData.length === 0) { return; }
+
+        detailedImpactData = {};
+        const allTeams = [...new Set(matchData.map(m => m.Team))];
+        allTeams.forEach(team => detailedImpactData[team] = { netPoints: 0, transactions: [] });
+        
+        const weeklyTransactions = transactionData.filter(t => parseInt(t.Gameweek) === targetGW);
+        const weeklyScores = weeklyPlayerData[targetGW];
+        const tbody = document.getElementById('immediate-impact-body');
+
+        if (!weeklyScores) {
+            tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No player data available for GW${targetGW}.</td></tr>`;
+            return;
+        }
+
+        weeklyTransactions.forEach(t => {
+            const teamName = t.Manager ? t.Manager.trim() : null;
+            const playerName = t.Player ? t.Player.trim() : null;
+            const type = t.Type ? t.Type.toLowerCase() : null;
+
+            if (!teamName || !playerName) return;
+
+            const playerStats = weeklyScores.find(p => p.Player && p.Player.trim().toLowerCase() === playerName.toLowerCase());
+            const actualPoints = playerStats ? (parseFloat(playerStats['FPts']) || 0) : 0;
+
+            if (detailedImpactData.hasOwnProperty(teamName)) {
+                let impact = 0;
+                if (type === 'claim') {
+                    impact = actualPoints;
+                } else if (type === 'drop') {
+                    impact = -actualPoints;
+                }
+                
+                if (impact !== 0) {
+                    detailedImpactData[teamName].netPoints += impact;
+                     detailedImpactData[teamName].transactions.push({
+                        playerName: t.Player, type: t.Type, points: impact, transactionGW: targetGW
+                    });
+                }
+            }
+        });
+
+        const sortedImpact = Object.entries(detailedImpactData)
+            .filter(([,data]) => data.transactions.length > 0)
+            .sort(([,a],[,b]) => b.netPoints - a.netPoints);
+
+        if (sortedImpact.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No transactions with an impact for GW${targetGW}.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = sortedImpact.map(([team, data], index) => {
+            const netPoints = data.netPoints;
+            const colorClass = netPoints > 0 ? 'text-green-500' : 'text-red-500';
+            const sign = netPoints > 0 ? '+' : '';
+            return `<tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showImpactDetails('${team}', ${targetGW})">
+                        <td class="py-2 font-semibold">${index + 1}</td>
+                        <td class="py-2">${team}</td>
+                        <td class="py-2 font-bold ${colorClass}">${sign}${netPoints.toFixed(1)}</td>
+                    </tr>`;
+        }).join('');
+    }
+
+function calculateAndRenderCumulativeImpact(targetGW) {
+    cumulativeDetailedImpactData = {}; // Reset data
+    const allTeams = [...new Set(matchData.map(m => m.Team))];
+    allTeams.forEach(team => {
+        cumulativeDetailedImpactData[team] = { netPoints: 0, claims: [], drops: [] };
+    });
+
+    const relevantTransactions = transactionData.filter(t => parseInt(t.Gameweek) <= targetGW);
+
+    relevantTransactions.forEach(t => {
+        const teamName = t.Manager ? t.Manager.trim() : null;
+        if (!teamName || !cumulativeDetailedImpactData.hasOwnProperty(teamName)) return;
+
+        const transactionGW = parseInt(t.Gameweek);
+        const playerName = t.Player ? t.Player.trim() : null;
+        const type = t.Type ? t.Type.toLowerCase() : null;
+        if (!playerName || !type) return;
+
+        let pointImpact = 0;
+        for (let gw = transactionGW; gw <= targetGW; gw++) {
+            const weeklyScores = weeklyPlayerData[gw];
+            if (!weeklyScores) continue;
+            const playerStats = weeklyScores.find(p => p.Player && p.Player.trim().toLowerCase() === playerName.toLowerCase());
+            pointImpact += playerStats ? (parseFloat(playerStats['FPts']) || 0) : 0;
+        }
+
+        if (type === 'claim') {
+            cumulativeDetailedImpactData[teamName].netPoints += pointImpact;
+            cumulativeDetailedImpactData[teamName].claims.push({ playerName, transactionGW, pointImpact });
+        } else if (type === 'drop') {
+            cumulativeDetailedImpactData[teamName].netPoints -= pointImpact;
+            cumulativeDetailedImpactData[teamName].drops.push({ playerName, transactionGW, pointImpact });
+        }
+    });
+
+const sortedImpacts = Object.entries(cumulativeDetailedImpactData)
+    .map(([team, data]) => ({ team, netPoints: data.netPoints }))
+    .filter(data => data.netPoints !== 0) // Add this line
+    .sort((a, b) => b.netPoints - a.netPoints);
+    
+    const tbody = document.getElementById('cumulative-impact-body');
+    tbody.innerHTML = sortedImpacts.map((data, index) => {
+        const colorClass = data.netPoints >= 0 ? 'text-green-500' : 'text-red-500';
+        const sign = data.netPoints >= 0 ? '+' : '';
+        // Add the onclick event to the table row
+        return `<tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showCumulativeImpactDetails('${data.team}', ${targetGW})">
+                    <td class="py-2 font-semibold">${index + 1}</td>
+                    <td class="py-2">${data.team}</td>
+                    <td class="py-2 font-bold ${colorClass}">${sign}${data.netPoints.toFixed(1)}</td>
+                </tr>`;
+    }).join('');
+}
+
+function showCumulativeImpactDetails(teamName, targetGW) {
+    const data = cumulativeDetailedImpactData[teamName];
+    if (!data) return;
+
+    document.getElementById('cumulative-modal-title').innerText = `Cumulative Impact Details for ${teamName} (up to GW${targetGW})`;
+    const claimsBody = document.getElementById('claims-body');
+    const dropsBody = document.getElementById('drops-body');
+    
+    // Sort claims by most points gained
+    data.claims.sort((a, b) => b.pointImpact - a.pointImpact);
+    // Sort drops by most points missed
+    data.drops.sort((a, b) => b.pointImpact - a.pointImpact);
+
+    claimsBody.innerHTML = data.claims.length > 0 ? data.claims.map(t => `
+        <tr class="border-b border-gray-100 dark:border-gray-700">
+            <td class="py-2">${t.playerName} (GW${t.transactionGW})</td>
+            <td class="py-2 text-right font-semibold text-green-500">+${t.pointImpact.toFixed(1)}</td>
+        </tr>`).join('') : `<tr><td colspan="2" class="py-2 text-gray-500">No claims made.</td></tr>`;
+
+    dropsBody.innerHTML = data.drops.length > 0 ? data.drops.map(t => `
+        <tr class="border-b border-gray-100 dark:border-gray-700">
+            <td class="py-2">${t.playerName} (GW${t.transactionGW})</td>
+            <td class="py-2 text-right font-semibold text-red-500">-${t.pointImpact.toFixed(1)}</td>
+        </tr>`).join('') : `<tr><td colspan="2" class="py-2 text-gray-500">No drops made.</td></tr>`;
+    
+    document.getElementById('cumulative-impact-modal').classList.remove('hidden');
+}
+
+function hideCumulativeImpactDetails() {
+    document.getElementById('cumulative-impact-modal').classList.add('hidden');
+}
+    function showImpactDetails(teamName, targetGW) {
+        const data = detailedImpactData[teamName];
+        if (!data) return;
+
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modal = document.getElementById('impact-modal');
+
+        modalTitle.innerText = `Immediate Impact Details for ${teamName} (GW${targetGW})`;
+        
+        const sortedTransactions = data.transactions.sort((a, b) => b.points - a.points);
+
+        if (sortedTransactions.length === 0) {
+            modalBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No transactions with a point impact for this gameweek.</td></tr>`;
+        } else {
+            modalBody.innerHTML = sortedTransactions.map(t => {
+                const points = t.points;
+                const colorClass = points > 0 ? 'text-green-500' : 'text-red-500';
+                const sign = points > 0 ? '+' : '';
+                return `
+                    <tr class="border-b border-gray-100 dark:border-gray-700">
+                        <td class="py-2">${t.playerName}</td>
+                        <td class="py-2">${t.type}</td>
+                        <td class="py-2 font-semibold ${colorClass}">${sign}${points.toFixed(1)}</td>
+                    </tr>`;
+            }).join('');
+        }
+        modal.classList.remove('hidden');
+    }
+
+    function hideImpactDetails() {
+        document.getElementById('impact-modal').classList.add('hidden');
+    }
+    
+    function calculateAndRenderOverallImpact(targetGW) {
+        const scoresForGW = weeklyPlayerData[targetGW];
+        const tbody = document.getElementById('overall-impact-body');
+
+        if (!scoresForGW || Object.keys(teamMappings).length === 0) {
+            tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Roster or score data is missing for GW${targetGW}.</td></tr>`;
+            return;
+        }
+
+        const teamTotals = {};
+        const allTeams = Object.values(teamMappings);
+        allTeams.forEach(team => teamTotals[team] = 0);
+
+        scoresForGW.forEach(player => {
+            const managerUsername = player.Status;
+            const managerName = teamMappings[managerUsername];
+            if (managerName && teamTotals.hasOwnProperty(managerName)) {
+                teamTotals[managerName] += parseFloat(player['FPts']) || 0;
+            }
+        });
+
+        const teamTotalsArray = Object.entries(teamTotals)
+            .map(([team, totalPoints]) => ({ team, totalPoints }))
+            .sort((a, b) => b.totalPoints - a.totalPoints);
+        
+        tbody.innerHTML = teamTotalsArray.map((data, index) => {
+            return `<tr class="border-b border-gray-100 dark:border-gray-700">
+                        <td class="py-2 font-semibold">${index + 1}</td>
+                        <td class="py-2">${data.team}</td>
+                        <td class="py-2 font-bold">${data.totalPoints.toFixed(1)}</td>
+                    </tr>`;
+        }).join('');
+    }
+
+    function updatePlayerView() {
+        const selectedGW = document.getElementById('gameweek-selector').value;
+        const statsViewType = document.getElementById('player-stats-selector').value;
+        let sourceData = [];
+        let title = "Player Statistics";
+        let kpiSuffix = "";
+
+        if (statsViewType === 'weekly') {
+            sourceData = weeklyPlayerData[selectedGW] || [];
+            title = `Player Statistics (Gameweek ${selectedGW})`;
+            kpiSuffix = ` (Selected GW)`;
+        } else {
+            sourceData = seasonTotalPlayerData;
+            title = `Player Statistics (Season Total)`;
+            kpiSuffix = ` (Season Total)`;
+        }
+
+        document.getElementById('player-stats-title').innerText = title;
+        document.getElementById('top-scorer-label').innerText = `Top Scorer${kpiSuffix}`;
+        document.getElementById('avg-points-label').innerText = `Avg. Points${kpiSuffix}`;
+        
+        if (sourceData.length === 0) {
+            ['total-players', 'top-scorer-name', 'avg-points'].forEach(id => document.getElementById(id).innerText = 'N/A');
+            document.getElementById('top-scorer-pts').innerText = '-- FPts';
+            if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().clear().draw(); }
+        } else {
+            document.getElementById('total-players').innerText = sourceData.length;
+            const topScorer = sourceData.reduce((a, b) => (parseFloat(a["FPts"] || 0) > parseFloat(b["FPts"] || 0)) ? a : b, { Player: 'N/A', FPts: 0 });
+            document.getElementById("top-scorer-name").innerText = topScorer["Player"];
+            document.getElementById("top-scorer-pts").innerText = `${parseFloat(topScorer["FPts"]).toFixed(1)} FPts`;
+            const avgPts = (sourceData.reduce((sum, p) => sum + parseFloat(p["FPts"] || 0), 0) / sourceData.length || 0).toFixed(1);
+            document.getElementById("avg-points").innerText = avgPts;
+
+            if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().destroy(); }
+            $('#players-table').DataTable({
+                data: sourceData,
+                columns: (sourceData[0] ? Object.keys(sourceData[0]) : []).map(k => ({ title: k, data: k })),
+                pageLength: 10, order: [[6, 'desc']], responsive: true,
+                language: { search: "Search players:", lengthMenu: "Show _MENU_ players", info: "Showing _START_ to _END_ of _TOTAL_ players" }
+            });
+        }
+        
+        calculateAndRenderCumulativeImpact(parseInt(selectedGW));
+        calculateAndRenderImmediateGWImpact(parseInt(selectedGW));
+        calculateAndRenderOverallImpact(parseInt(selectedGW));
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        const filesToLoad = ['record.csv', 'transactions.csv', 'team_mapping.csv'];
+        for (let i = 1; i <= MAX_GAMEWEEK; i++) { filesToLoad.push(`ref_gw${i}.csv`); }
+
+        const promises = filesToLoad.map(file => new Promise((resolve) => {
+            Papa.parse(file, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: results => resolve({ file, status: 'fulfilled', data: results.data }),
+                error: (err) => resolve({ file, status: 'rejected', error: err })
+            });
+        }));
+
+        Promise.all(promises).then(results => {
+            const getResult = (fileName) => results.find(r => r.file === fileName);
+
+            const recordResult = getResult('record.csv');
+            const transactionResult = getResult('transactions.csv');
+            const mappingResult = getResult('team_mapping.csv');
+
+            if (recordResult && recordResult.status === 'fulfilled') {
+                matchData = recordResult.data.filter(row => row.Team !== '*League Average*');
+            } else { console.error("CRITICAL: record.csv failed to load."); }
+
+            if (transactionResult && transactionResult.status === 'fulfilled') {
+                transactionData = transactionResult.data;
+            } else { console.error("CRITICAL: transactions.csv failed to load."); }
+
+            if (mappingResult && mappingResult.status === 'fulfilled') {
+                 teamMappings = Object.fromEntries(mappingResult.data.map(m => [m.Status, m.Team]));
+            } else { console.error("CRITICAL: team_mapping.csv failed to load."); }
+
+            weeklyPlayerData = {};
+            results.filter(r => r.file.startsWith('ref_gw')).forEach(result => {
+                if (result.status === 'fulfilled' && result.data.length > 0) {
+                    const gw = result.file.match(/_gw(\d+)/)[1];
+                    weeklyPlayerData[gw] = result.data;
+                }
+            });
+            
+            const recentTransLog = document.getElementById('transaction-log-body');
+            if (transactionData.length > 0 && recentTransLog) {
+                const sortedTransactions = transactionData.sort((a,b) => new Date(b['Date (BST)']) - new Date(a['Date (BST)']));
+                recentTransLog.innerHTML = sortedTransactions.slice(0, 50).map(t => {
+                    return `<tr class="border-b border-gray-100 dark:border-gray-700">
+                                <td class="py-2">${t.Player}</td>
+                                <td class="py-2">${t.Type}</td>
+                                <td class="py-2">${t.Manager}</td>
+                                <td class="py-2">${t.Gameweek}</td>
+                            </tr>`;
+                }).join('');
+            }
+
+            seasonTotalPlayerData = calculateSeasonTotals();
+            populateGameweekSelector();
+            
+            document.getElementById('loading-message').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+
+            showSection('league');
+            updatePlayerView(); 
+        });
+    });
+</script>
+
+<style>
+    .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate { color: #9CA3AF; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button { color: #9CA3AF !important; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: #374151 !important; border-color: #374151 !important; }
+    .dataTables_wrapper table.dataTable tbody tr { background-color: transparent; }
+    .dataTables_wrapper table.dataTable tbody tr:hover { background-color: rgba(55, 65, 81, 0.5) !important; }
+    .section-content { transition: opacity 0.3s ease-in-out; }
+    .section-content.hidden { opacity: 0; display: none; }
+    input[type="checkbox"] { accent-color: #3B82F6; }
+    canvas { max-height: 300px !important; }
+    @media (max-width: 1024px) { #performance-matrix-chart { max-height: 400px !important; } }
+</style>
+
+<div id="impact-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+    <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 id="modal-title" class="text-xl font-bold">Transaction Details</h3>
+      <button onclick="hideImpactDetails()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="p-6 overflow-y-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-200 dark:border-gray-700">
+            <th class="text-left py-2">Player</th>
+            <th class="text-left py-2">Transaction Type</th>
+            <th class="text-left py-2">Points Impact</th>
+          </tr>
+        </thead>
+        <tbody id="modal-body">
+          </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="cumulative-impact-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+    <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 id="cumulative-modal-title" class="text-xl font-bold">Cumulative Impact Details</h3>
+      <button onclick="hideCumulativeImpactDetails()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h4 class="text-lg font-semibold mb-2 text-green-500">Players Claimed (Points Gained)</h4>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-2">Player (Claimed GW)</th>
+              <th class="text-right py-2">Points Since Claim</th>
+            </tr>
+          </thead>
+          <tbody id="claims-body"></tbody>
+        </table>
+      </div>
+      <div>
+        <h4 class="text-lg font-semibold mb-2 text-red-500">Players Dropped (Points Missed)</h4>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-2">Player (Dropped GW)</th>
+              <th class="text-right py-2">Points Since Drop</th>
+            </tr>
+          </thead>
+          <tbody id="drops-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
