@@ -704,8 +704,10 @@ function hideCumulativeImpactDetails() {
     
     document.addEventListener("DOMContentLoaded", () => {
         const filesToLoad = ['record.csv', 'transactions.csv', 'team_mapping.csv'];
-        for (let i = 1; i <= MAX_GAMEWEEK; i++) { filesToLoad.push(`ref_gw${i}.csv`); }
-
+      for (let i = 1; i <= MAX_GAMEWEEK; i++) {
+        filesToLoad.push(`ref_gw${i}.csv`);
+         filesToLoad.push(`keepers_gw${i}.csv`);
+      }
         const promises = filesToLoad.map(file => new Promise((resolve) => {
             Papa.parse(file, {
                 download: true, header: true, skipEmptyLines: true,
@@ -734,13 +736,32 @@ function hideCumulativeImpactDetails() {
             } else { console.error("CRITICAL: team_mapping.csv failed to load."); }
 
             weeklyPlayerData = {};
-            results.filter(r => r.file.startsWith('ref_gw')).forEach(result => {
-                if (result.status === 'fulfilled' && result.data.length > 0) {
-                    const gw = result.file.match(/_gw(\d+)/)[1];
-                    weeklyPlayerData[gw] = result.data;
-                }
-            });
             
+            // Helper to safely add rows
+            function addWeeklyData(gw, rows) {
+              if (!weeklyPlayerData[gw]) {
+                weeklyPlayerData[gw] = [];
+              }
+              weeklyPlayerData[gw].push(...rows);
+            }
+            
+            results.forEach(result => {
+              if (result.status !== 'fulfilled' || !result.data || result.data.length === 0) return;
+            
+              const match = result.file.match(/_gw(\d+)/);
+              if (!match) return;
+            
+              const gw = match[1];
+            
+              if (result.file.startsWith('ref_gw')) {
+                addWeeklyData(gw, result.data);
+              }
+            
+              if (result.file.startsWith('keepers_gw')) {
+                addWeeklyData(gw, result.data);
+              }
+            })
+          
             const recentTransLog = document.getElementById('transaction-log-body');
             if (transactionData.length > 0 && recentTransLog) {
                 const sortedTransactions = transactionData.sort((a,b) => new Date(b['Date (BST)']) - new Date(a['Date (BST)']));
@@ -753,6 +774,16 @@ function hideCumulativeImpactDetails() {
                             </tr>`;
                 }).join('');
             }
+
+                    // 🔍 DEBUG: confirm players per gameweek (including keepers)
+          Object.keys(weeklyPlayerData)
+            .sort((a, b) => a - b)
+            .forEach(gw => {
+              console.log(
+                `GW${gw}: ${weeklyPlayerData[gw].length} total players`,
+                weeklyPlayerData[gw]
+              );
+            });
 
             seasonTotalPlayerData = calculateSeasonTotals();
             populateGameweekSelector();
