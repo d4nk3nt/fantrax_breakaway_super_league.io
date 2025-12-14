@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" data-theme="dark" class="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,215 +14,391 @@
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
-  <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-4">
-    <div class="flex space-x-8 items-center">
-      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Analytics Dashboard</h1>
-      <div class="flex space-x-6">
-        <button onclick="showSection('league')" class="nav-btn text-lg font-semibold text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1" data-section="league">
-          League
-        </button>
-        <button onclick="showSection('players')" class="nav-btn text-lg font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200" data-section="players">
-          Players
+<body class="app-body text-gray-900 dark:text-gray-100">
+
+  <header class="app-header shadow-sm border-b border-transparent p-4">
+    <div class="flex items-center justify-between">
+      <div class="flex space-x-8 items-center">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Analytics Dashboard</h1>
+        <div class="flex space-x-6">
+          <button onclick="showSection('league')"
+            class="nav-btn text-lg font-semibold text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 pb-1"
+            data-section="league">
+            League
+          </button>
+          <button onclick="showSection('players')"
+            class="nav-btn text-lg font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            data-section="players">
+            Players
+          </button>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button id="theme-toggle"
+          class="theme-toggle-btn px-4 py-2 text-sm font-semibold rounded-full border border-transparent transition-colors duration-150"
+          type="button" onclick="toggleTheme()">
+          Toggle Theme
         </button>
       </div>
     </div>
   </header>
 
   <div id="loading-message" class="p-8 text-center text-gray-500">Loading all data...</div>
-  
+
   <div id="main-content" class="hidden">
     <section id="league-section" class="section-content">
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">Latest Gameweek</p>
-                    <h2 id="current-gameweek" class="text-3xl font-bold">5</h2>
-                </div>
-            </div>
+      <div class="p-6">
+        <div class="dashboard-grid dashboard-grid--summary">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Latest Gameweek</p>
+            <select id="current-gameweek"
+              class="text-2xl font-bold bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1"
+              onchange="onCurrentGameweekChange()"></select>
+          </div>
         </div>
+      </div>
 
-        <div class="p-6 pt-0">
+      <div class="p-6 pt-0">
         <div class="mb-6">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
             <h3 class="text-lg font-semibold mb-4">Select Teams to Highlight</h3>
             <div id="team-checkboxes" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                </div>
             </div>
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="score-chart-title" class="text-lg font-semibold">Score Trends by Gameweek</h3>
-                    <select id="score-chart-selector" onchange="updateLeagueView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option value="weekly" selected>Weekly Score</option>
-                        <option value="cumulative">Cumulative Score</option>
-                    </select>
-                </div>
-                <canvas id="score-trends-chart" width="400" height="300"></canvas>
+        <div class="analysis-grid charts-grid mb-6">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 id="score-chart-title" class="text-lg font-semibold">Score Trends by Gameweek</h3>
+              <select id="score-chart-selector" onchange="updateLeagueView()"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option value="weekly" selected>Weekly Score</option>
+                <option value="cumulative">Cumulative Score</option>
+              </select>
             </div>
+            <canvas id="score-trends-chart" width="400" height="300"></canvas>
+          </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="win-trends-title" class="text-lg font-semibold">Cumulative Wins</h3>
-                    <select id="win-trends-selector" onchange="updateLeagueView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option value="cumulative" selected>Cumulative Wins</option>
-                        <option value="result">Match Result</option>
-                    </select>
-                </div>
-                <canvas id="win-trends-chart" width="400" height="300"></canvas>
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h3 id="win-trends-title" class="text-lg font-semibold">Cumulative Wins</h3>
+              <select id="win-trends-selector" onchange="updateLeagueView()"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option value="cumulative" selected>Cumulative Wins</option>
+                <option value="result">Match Result</option>
+              </select>
             </div>
+            <canvas id="win-trends-chart" width="400" height="300"></canvas>
+          </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
             <h3 class="text-lg font-semibold mb-4">Win Rate by Team</h3>
             <canvas id="win-rate-chart" width="400" height="300"></canvas>
-            </div>
-            
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                <h3 class="text-lg font-semibold mb-4">Team Performance Matrix</h3>
-                <canvas id="performance-matrix-chart" width="800" height="400"></canvas>
-            </div>
+          </div>
+
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-semibold mb-4">Team Performance Matrix</h3>
+            <canvas id="performance-matrix-chart" width="800" height="400"></canvas>
+          </div>
         </div>
-        
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-            <h3 class="text-xl font-bold mb-4">League Standings</h3>
-            <div class="overflow-x-auto">
-            <table id="standings-table" class="w-full text-sm">
-                <thead>
+
+        <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-4">League Standings</h3>
+          <div class="overflow-x-auto">
+            <table id="standings-table" class="dashboard-table w-full text-sm">
+              <thead>
                 <tr class="border-b border-gray-200 dark:border-gray-700">
-                    <th class="text-left py-2">Pos</th>
-                    <th class="text-left py-2">Team</th>
-                    <th class="text-left py-2">W</th>
-                    <th class="text-left py-2">L</th>
-                    <th class="text-left py-2">Points For</th>
-                    <th class="text-left py-2">Points Against</th>
-                    <th class="text-left py-2">Avg Score</th>
+                  <th class="text-left py-2">Pos</th>
+                  <th class="text-left py-2">Team</th>
+                  <th class="text-left py-2">W</th>
+                  <th class="text-left py-2">L</th>
+                  <th class="text-left py-2">Points For</th>
+                  <th class="text-left py-2">Points Against</th>
+                  <th class="text-left py-2">Avg Score</th>
                 </tr>
-                </thead>
-                <tbody id="standings-body">
-                </tbody>
+              </thead>
+              <tbody id="standings-body">
+              </tbody>
             </table>
-            </div>
+          </div>
         </div>
-        </div>
+      </div>
     </section>
 
     <section id="players-section" class="section-content hidden">
-        <div class="p-6 pb-2">
-            <div class="flex items-center space-x-4 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 max-w-sm">
-                <label for="gameweek-selector" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select Gameweek:</label>
-                <select id="gameweek-selector" onchange="updatePlayerView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                </select>
-            </div>
+      <div class="p-6 pb-2">
+        <div class="dashboard-card flex items-center space-x-4 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 max-w-sm">
+          <label for="gameweek-selector" class="text-sm font-medium text-gray-700 dark:text-gray-300">Select
+            Gameweek:</label>
+          <select id="gameweek-selector" onchange="updatePlayerView()"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          </select>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <div class="dashboard-grid dashboard-grid--metrics mb-8">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Total Players</p>
+            <h2 id="total-players" class="text-3xl font-bold">0</h2>
+          </div>
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <p id="top-scorer-label" class="text-gray-500 dark:text-gray-400 text-sm">Top Scorer (Selected GW)</p>
+            <h2 id="top-scorer-name" class="text-xl font-bold">Loading...</h2>
+            <p id="top-scorer-pts" class="text-sm">-- FPts</p>
+          </div>
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <p id="avg-points-label" class="text-gray-500 dark:text-gray-400 text-sm">Avg. Points (Selected GW)</p>
+            <h2 id="avg-points" class="text-3xl font-bold">0</h2>
+          </div>
         </div>
 
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <p class="text-gray-500 dark:text-gray-400 text-sm">Total Players</p>
-                    <h2 id="total-players" class="text-3xl font-bold">0</h2>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <p id="top-scorer-label" class="text-gray-500 dark:text-gray-400 text-sm">Top Scorer (Selected GW)</p>
-                    <h2 id="top-scorer-name" class="text-xl font-bold">Loading...</h2>
-                    <p id="top-scorer-pts" class="text-sm">-- FPts</p>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <p id="avg-points-label" class="text-gray-500 dark:text-gray-400 text-sm">Avg. Points (Selected GW)</p>
-                    <h2 id="avg-points" class="text-3xl font-bold">0</h2>
-                </div>
+        <div class="analysis-grid mb-8" id="team-impact-grid">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-xl font-bold mb-4">Cumulative Transaction Impact</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Net points impact from all transactions calculated
+              up to the selected gameweek.</p>
+            <table class="dashboard-table w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <th class="text-left py-2">Rank</th>
+                  <th class="text-left py-2">Team</th>
+                  <th class="text-left py-2">Net Points Impact</th>
+                </tr>
+              </thead>
+              <tbody id="cumulative-impact-body">
+              </tbody>
+            </table>
+          </div>
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-xl font-bold mb-4">Trade Impact (Selected GW)</h3>
+            <p class="text-sm text-gray-500 mb-4">
+              Net fantasy points gained or lost from trades.
+            </p>
+            <div class="flex items-center space-x-2 mb-4">
+              <button id="trade-view-team"
+                class="px-3 py-1 rounded text-sm font-semibold transition-colors duration-150 bg-blue-600 text-white dark:bg-blue-500 dark:text-white"
+                onclick="setTradeImpactViewMode('team')">
+                By Team
+              </button>
+              <button id="trade-view-trade"
+                class="px-3 py-1 rounded text-sm font-semibold transition-colors duration-150 bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                onclick="setTradeImpactViewMode('trade')">
+                By Trade
+              </button>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <h3 class="text-xl font-bold mb-4">Cumulative Transaction Impact</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Net points impact from all transactions calculated up to the selected gameweek.</p>
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <th class="text-left py-2">Rank</th>
-                                <th class="text-left py-2">Team</th>
-                                <th class="text-left py-2">Net Points Impact</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cumulative-impact-body">
-                        </tbody>
-                    </table>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <h3 class="text-xl font-bold mb-4">Immediate Impact Analysis (Selected GW)</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Net points from claims/drops made for the selected gameweek.</p>
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <th class="text-left py-2">Rank</th>
-                                <th class="text-left py-2">Team</th>
-                                <th class="text-left py-2">Net Points Impact</th>
-                            </tr>
-                        </thead>
-                        <tbody id="immediate-impact-body">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <h3 class="text-xl font-bold mb-4">Overall Roster Impact (Selected GW)</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Total points scored by the final roster for the selected gameweek, based on all prior transactions.</p>
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                <th class="text-left py-2">Rank</th>
-                                <th class="text-left py-2">Team</th>
-                                <th class="text-left py-2">Total Roster Points</th>
-                            </tr>
-                        </thead>
-                        <tbody id="overall-impact-body">
-                        </tbody>
-                    </table>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                    <h3 class="text-xl font-bold mb-4">Recent Transactions</h3>
-                    <div class="overflow-y-auto h-64">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="border-b border-gray-200 dark:border-gray-700">
-                                    <th class="text-left py-2">Player</th>
-                                    <th class="text-left py-2">Type</th>
-                                    <th class="text-left py-2">Team</th>
-                                    <th class="text-left py-2">GW</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transaction-log-body">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="player-stats-title" class="text-xl font-bold">Player Statistics</h3>
-                    <select id="player-stats-selector" onchange="updatePlayerView()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option value="weekly" selected>Selected Gameweek</option>
-                        <option value="total">Season Total</option>
-                    </select>
-                </div>
-                <table id="players-table" class="display stripe hover w-full text-sm"></table>
-            </div>
+            <table id="trade-impact-table" class="dashboard-table w-full text-sm">
+              <thead>
+                <tr id="trade-impact-header" class="border-b">
+                  <th>Rank</th>
+                  <th>Team</th>
+                  <th>Trade Impact</th>
+                </tr>
+              </thead>
+              <tbody id="trade-impact-body"></tbody>
+            </table>
+          </div>
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-xl font-bold mb-2">Original Roster Retention (Selected GW)</h3>
+            <p class="text-sm text-gray-500 mb-4">How many drafted players remain on each roster for the selected gameweek.</p>
+            <table class="dashboard-table text-sm w-full">
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th>Originals Remaining</th>
+                </tr>
+              </thead>
+              <tbody id="original-retention-body"></tbody>
+            </table>
+          </div>
         </div>
+
+        <div class="analysis-grid mb-8" id="transaction-impact-grid">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-xl font-bold mb-4">Immediate Impact Analysis (Selected GW)</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Net points from claims/drops made for the selected
+              gameweek.</p>
+            <table class="dashboard-table w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <th class="text-left py-2">Rank</th>
+                  <th class="text-left py-2">Team</th>
+                  <th class="text-left py-2">Net Points Impact</th>
+                </tr>
+              </thead>
+              <tbody id="immediate-impact-body">
+              </tbody>
+            </table>
+          </div>
+
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-xl font-bold mb-4">Overall Roster Impact (Selected GW)</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Total points scored by the final roster for the
+              selected gameweek, based on all prior transactions.</p>
+            <table class="dashboard-table w-full text-sm">
+              <thead>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <th class="text-left py-2">Rank</th>
+                  <th class="text-left py-2">Team</th>
+                  <th class="text-left py-2">Total Roster Points</th>
+                </tr>
+              </thead>
+              <tbody id="overall-impact-body">
+              </tbody>
+            </table>
+          </div>
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h3 class="text-xl font-bold mb-4">Recent Transactions</h3>
+            <div class="overflow-y-auto h-64">
+              <table class="dashboard-table w-full text-sm">
+                <thead>
+                  <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <th class="text-left py-2">Player</th>
+                    <th class="text-left py-2">Type</th>
+                    <th class="text-left py-2">Team</th>
+                    <th class="text-left py-2">GW</th>
+                  </tr>
+                </thead>
+                <tbody id="transaction-log-body">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 id="player-stats-title" class="text-xl font-bold">Player Statistics</h3>
+            <select id="player-stats-selector" onchange="updatePlayerView()"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <option value="weekly" selected>Selected Gameweek</option>
+              <option value="total">Season Total</option>
+            </select>
+          </div>
+          <table id="players-table" class="dashboard-table display stripe hover w-full text-sm"></table>
+        </div>
+      </div>
     </section>
   </div>
 
-<script>
+  <script>
+    const THEME_STORAGE_KEY = 'dashboard-theme';
+
+    function applyTheme(theme) {
+      const html = document.documentElement;
+      const body = document.body;
+      if (theme === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+        html.classList.add('dark');
+        body.classList.add('theme-dark');
+        body.classList.remove('theme-light');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        html.classList.remove('dark');
+        body.classList.add('theme-light');
+        body.classList.remove('theme-dark');
+      }
+      updateThemeToggleButton(theme);
+    }
+
+    function updateThemeToggleButton(theme) {
+      const btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      if (theme === 'dark') {
+        btn.innerText = 'Switch to Light Mode';
+      } else {
+        btn.innerText = 'Switch to Dark Mode';
+      }
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      } catch (err) {
+        console.warn('Unable to persist theme preference', err);
+      }
+    }
+
+    const storedTheme = (() => {
+      try {
+        return localStorage.getItem(THEME_STORAGE_KEY);
+      } catch {
+        return null;
+      }
+    })();
+    applyTheme(storedTheme || 'dark');
+
+    function normalizeName(name) {
+      return (name || '')
+        .toString()
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .replace(/[’']/g, "'"); // normalize smart apostrophes
+    }
+
+    let weeklyIndex = {}; // { gw: Map(normalizedPlayerName -> fpts) }
+
+    function buildWeeklyIndex() {
+      weeklyIndex = {};
+      Object.entries(weeklyPlayerData).forEach(([gw, rows]) => {
+        const map = new Map();
+        rows.forEach(r => {
+          const key = normalizeName(r.Player);
+          if (!key) return;
+          const fpts = parseFloat(r.FPts) || 0;
+          map.set(key, fpts);
+        });
+        weeklyIndex[gw] = map;
+      });
+    }
+    let CURRENT_GAMEWEEK = null;
+
+    let playerEvents = {}; // { playerKey: [ {gw, type, team, playerName} ... ] }
+
+
+    function onCurrentGameweekChange() {
+      CURRENT_GAMEWEEK = parseInt(
+        document.getElementById('current-gameweek').value
+      );
+
+      console.log('[UI] Current gameweek set to', CURRENT_GAMEWEEK);
+
+      updateLeagueView();
+      updatePlayerView();
+    }
+    let ownershipTimeline = {};
+    let playerCurrentOwner = {};
+    let tradesData = [];
+    let tradeGroups = [];
+    let allMoves = []; // unified stream of claim/drop/trade-moves
     let matchData = [], transactionData = [], weeklyPlayerData = {}, seasonTotalPlayerData = [], charts = {};
+    const PLAYER_TABLE_COLUMNS = [
+      'Player', 'Team', 'Position', 'Status',
+      'FPts', 'FP/G',
+      'Min', 'G', 'A', 'CS', 'GA', 'S'
+    ];
     let detailedImpactData = {};
     let cumulativeDetailedImpactData = {};
+
     let teamMappings = {};
-    const MAX_GAMEWEEK = 5;
+    const MAX_GAMEWEEK = 15;
     const teamColors = { "Book Ake": "#4299E1", "Bryan MBeumboclaat": "#E53E3E", "Chicken Tikka MoSalah": "#38A169", "Ekitiki-taka": "#ECC94B", "ESRs EDL for FPL": "#9F7AEA", "FPL Loyalists": "#ED8936", "Haile Senesi": "#3182CE", "I’m a Baleba": "#D53F8C", "Infantino Milan": "#4FD1C5", "Iwobi Wan-Kenobi": "#F6AD55", "Me,Myself,Ndiaye": "#805AD5", "Texas Chainshaw Massacre": "#2C7A7B", "Ugarte roll with it": "#A0AEC0" };
     function getTeamColor(teamName) { return teamColors[teamName] || '#9CA3AF'; }
+    function getFilteredMatchData() {
+      if (CURRENT_GAMEWEEK == null) return matchData;
+
+      return matchData.filter(m => {
+        const gw = parseInt(m.Gameweek);
+        return !isNaN(gw) && gw <= CURRENT_GAMEWEEK;
+      });
+    }
+
 
     function showSection(sectionName) {
       document.querySelectorAll('.section-content').forEach(section => section.classList.add('hidden'));
@@ -234,16 +411,548 @@
       activeBtn.classList.add('text-blue-600', 'dark:text-blue-400', 'border-b-2', 'border-blue-600', 'dark:border-blue-400');
       activeBtn.classList.remove('text-gray-500', 'dark:text-gray-400');
       if (sectionName === 'league' && Object.keys(charts).length === 0) {
-          setTimeout(initializeCharts, 100); 
+        setTimeout(initializeCharts, 100);
       }
     }
+
+    function buildTradeGroups() {
+      tradeGroups = [];
+      const groups = new Map();
+      const duplicateCounter = {};
+
+      (tradesData || []).forEach((tr, index) => {
+        const player = (tr['Player'] || '').trim();
+        const fromTeam = (tr['From'] || tr['From '] || '').trim();
+        const toTeam = (tr['To'] || tr['To '] || '').trim();
+        const rawDate = (tr['Date (GMT)'] || tr['Date (GMT) '] || '').trim();
+        const gw = parseInt(tr['Gameweek']);
+        const teamsKey = [fromTeam, toTeam].filter(Boolean).sort().join('|');
+
+        let baseKey = rawDate ? `${rawDate}|${teamsKey}` : '';
+        if (!baseKey) {
+          baseKey = `GW${isNaN(gw) ? 'NA' : gw}|${teamsKey}|${player || 'player'}|${index}`;
+        }
+
+        let key = baseKey;
+        if (groups.has(key)) {
+          const nextCount = (duplicateCounter[baseKey] || 1) + 1;
+          duplicateCounter[baseKey] = nextCount;
+          key = `${baseKey}|dup${nextCount}`;
+        } else {
+          duplicateCounter[baseKey] = 1;
+        }
+
+        if (!groups.has(key)) {
+          groups.set(key, {
+            id: key,
+            date: rawDate || null,
+            gameweek: isNaN(gw) ? null : gw,
+            participants: new Set(),
+            legs: []
+          });
+        }
+
+        const group = groups.get(key);
+        [fromTeam, toTeam].forEach(team => {
+          if (team) group.participants.add(team);
+        });
+
+        group.legs.push({
+          player,
+          fromTeam,
+          toTeam,
+          gameweek: isNaN(gw) ? null : gw
+        });
+
+        tr.__tradeGroupId = key;
+        tr.__tradeDate = rawDate || null;
+        tr.__tradeGameweek = isNaN(gw) ? null : gw;
+      });
+
+      tradeGroups = Array.from(groups.values()).map(group => ({
+        ...group,
+        participants: Array.from(group.participants)
+      }));
+    }
+
+    function buildUnifiedMoves() {
+      const moves = [];
+
+      // 1) Waiver / FA claims & drops (transactions.csv)
+      (transactionData || []).forEach(t => {
+        moves.push({
+          ...t,
+          Type: (t.Type || '').toLowerCase(),
+          Gameweek: parseInt(t.Gameweek),
+          __source: 'waiver',
+          __date: t['Date (BST)'] || null
+        });
+      });
+
+      // 2) Trades (trades.csv) -> 2 synthetic moves per row
+      let expanded = 0;
+      let skipped = 0;
+
+      (tradesData || []).forEach(tr => {
+        // Use bracket access to avoid subtle header issues
+        const player = (tr['Player'] || '').trim();
+        const gw = parseInt(tr['Gameweek']);
+        const fromTeam = (tr['From'] || tr['From '] || '').trim();
+        const toTeam = (tr['To'] || tr['To '] || '').trim();
+        const date = tr['Date (GMT)'] || tr['Date (GMT) '] || null;
+        const tradeId = tr.__tradeGroupId || `${player}-${gw}-${fromTeam}-${toTeam}`;
+        const tradeDate = tr.__tradeDate || date;
+        const tradeGameweek = tr.__tradeGameweek || gw;
+        const participantKey = [fromTeam, toTeam].filter(Boolean).sort().join('|');
+        const aggregateKey = `${isNaN(tradeGameweek) ? 'NA' : tradeGameweek}|${participantKey}`;
+
+        if (!player || !fromTeam || !toTeam || isNaN(gw)) {
+          skipped++;
+          return;
+        }
+
+        // Outgoing (treated like drop)
+        moves.push({
+          Player: player,
+          Type: 'drop',
+          Gameweek: gw,
+          Manager: fromTeam,
+          Team: tr['Team'],
+          Position: tr['Position'],
+          __source: 'trade',
+          __tradeId: tradeId,
+          __tradeDate: tradeDate,
+          __tradeGameweek: tradeGameweek,
+          __tradeParticipantsKey: participantKey,
+          __tradeAggregateKey: aggregateKey,
+          __tradeFrom: fromTeam,
+          __tradeTo: toTeam,
+          __date: date
+        });
+
+        // Incoming (treated like claim)
+        moves.push({
+          Player: player,
+          Type: 'claim',
+          Gameweek: gw,
+          Manager: toTeam,
+          Team: tr['Team'],
+          Position: tr['Position'],
+          __source: 'trade',
+          __tradeId: tradeId,
+          __tradeDate: tradeDate,
+          __tradeGameweek: tradeGameweek,
+          __tradeParticipantsKey: participantKey,
+          __tradeAggregateKey: aggregateKey,
+          __tradeFrom: fromTeam,
+          __tradeTo: toTeam,
+          __date: date
+        });
+
+        expanded++;
+      });
+
+      // Sort: GW then drop before claim (important for clean ownership boundaries)
+      const order = { drop: 0, claim: 1 };
+      moves.sort((a, b) => {
+        const g1 = parseInt(a.Gameweek), g2 = parseInt(b.Gameweek);
+        if (g1 !== g2) return g1 - g2;
+        return (order[a.Type] ?? 9) - (order[b.Type] ?? 9);
+      });
+
+      console.log(`[Moves] waivers=${(transactionData || []).length}, trades=${(tradesData || []).length}, tradeExpanded=${expanded}, tradeSkipped=${skipped}, totalMoves=${moves.length}`);
+
+      if ((draftClaimMoves || []).length) {
+        moves.push(...draftClaimMoves);
+      }
+
+      return moves;
+    }
+
+    let tradeImpactByTeam = {};
+    let tradeImpactByTrade = [];
+    let tradeImpactViewMode = 'team';
+    let draftResults = [];
+    let originalRosterByTeam = {};
+    let draftClaimMoves = [];
+    function calculateTradeImpact(targetGW) {
+      tradeImpactByTeam = {};
+      tradeImpactByTrade = [];
+
+      const allTeams = [...new Set(matchData.map(m => m.Team))];
+      allTeams.forEach(t => {
+        tradeImpactByTeam[t] = {
+          netPoints: 0,
+          received: [],
+          sent: []
+        };
+      });
+
+      const tradeTotals = new Map();
+
+      Object.entries(ownershipTimeline).forEach(([playerKey, windows]) => {
+        windows.forEach(w => {
+          // Only care about trade-derived ownership
+          const tradeMove = allMoves.find(m =>
+            normalizeName(m.Player) === playerKey &&
+            m.Gameweek === w.startGW &&
+            m.__source === 'trade'
+          );
+
+          if (!tradeMove) return;
+
+          const fromTeam = tradeMove.__tradeFrom;
+          const toTeam = tradeMove.__tradeTo;
+          const tradeParticipantsKey = tradeMove.__tradeParticipantsKey ||
+            [fromTeam, toTeam].filter(Boolean).sort().join('|');
+
+          const start = w.startGW;
+          const end = Math.min(w.endGW, targetGW, CURRENT_GAMEWEEK);
+          if (start > end) return;
+
+          const pts = sumPlayerPoints(playerKey, start, end);
+          if (pts === 0) return;
+
+          // Receiving team
+          tradeImpactByTeam[toTeam].netPoints += pts;
+          tradeImpactByTeam[toTeam].received.push({
+            player: w.playerName,
+            pts,
+            tradePartner: fromTeam,
+            tradeId: tradeMove.__tradeId,
+            gw: tradeMove.__tradeGameweek || start
+          });
+
+          // Sending team
+          tradeImpactByTeam[fromTeam].netPoints -= pts;
+          tradeImpactByTeam[fromTeam].sent.push({
+            player: w.playerName,
+            pts,
+            tradePartner: toTeam,
+            tradeId: tradeMove.__tradeId,
+            gw: tradeMove.__tradeGameweek || start
+          });
+
+          const tradeStartGW = tradeMove.__tradeGameweek ?? start;
+          const normalizedGW = isNaN(tradeStartGW) ? null : tradeStartGW;
+          const aggregateKey = tradeMove.__tradeAggregateKey ||
+            `${normalizedGW ?? 'NA'}|${tradeParticipantsKey}`;
+
+          if (!tradeTotals.has(aggregateKey)) {
+            tradeTotals.set(aggregateKey, {
+              id: aggregateKey,
+              date: tradeMove.__tradeDate || null,
+              dates: tradeMove.__tradeDate ? new Set([tradeMove.__tradeDate]) : new Set(),
+              gameweek: normalizedGW,
+              participantsKey: tradeParticipantsKey,
+              participants: new Map()
+            });
+          }
+
+          const tradeEntry = tradeTotals.get(aggregateKey);
+          tradeEntry.gameweek = tradeEntry.gameweek == null
+            ? normalizedGW
+            : (normalizedGW == null ? tradeEntry.gameweek : Math.min(tradeEntry.gameweek, normalizedGW));
+          if (tradeMove.__tradeDate) {
+            tradeEntry.dates.add(tradeMove.__tradeDate);
+            if (!tradeEntry.date) {
+              tradeEntry.date = tradeMove.__tradeDate;
+            }
+          }
+
+          if (!tradeEntry.participants.has(toTeam)) {
+            tradeEntry.participants.set(toTeam, { points: 0, players: [] });
+          }
+          const recipient = tradeEntry.participants.get(toTeam);
+          recipient.points += pts;
+          recipient.players.push({
+            player: w.playerName,
+            pts
+          });
+
+          if (!tradeEntry.participants.has(fromTeam)) {
+            tradeEntry.participants.set(fromTeam, { points: 0, players: [] });
+          }
+          const sender = tradeEntry.participants.get(fromTeam);
+          sender.points -= pts;
+          sender.players.push({
+            player: w.playerName,
+            pts: -pts
+          });
+        });
+      });
+
+      tradeImpactByTrade = Array.from(tradeTotals.values()).map(entry => {
+        const participants = Array.from(entry.participants.entries()).map(([team, detail]) => ({
+          team,
+          points: detail.points,
+          players: detail.players
+        })).sort((a, b) => b.points - a.points);
+
+        let winner = null;
+        let runnerUp = null;
+        let net = 0;
+
+        if (participants.length >= 2) {
+          winner = participants[0];
+          runnerUp = participants[1];
+          net = winner.points - runnerUp.points;
+        } else if (participants.length === 1) {
+          winner = participants[0];
+          net = winner.points;
+        }
+
+        const dates = entry.dates ? Array.from(entry.dates) : [];
+
+        return {
+          id: entry.id,
+          date: dates.length > 1 ? dates.join(', ') : (dates[0] || entry.date),
+          dates,
+          gameweek: entry.gameweek,
+          participants,
+          winner,
+          runnerUp,
+          net
+        };
+      }).sort((a, b) => (b.gameweek || 0) - (a.gameweek || 0));
+
+      return {
+        byTeam: tradeImpactByTeam,
+        byTrade: tradeImpactByTrade
+      };
+    }
+
+    function renderTradeImpact(targetGW) {
+      const { byTeam, byTrade } = calculateTradeImpact(targetGW);
+      const headerRow = document.getElementById('trade-impact-header');
+      const tbody = document.getElementById('trade-impact-body');
+      if (!tbody || !headerRow) return;
+
+      if (tradeImpactViewMode === 'trade') {
+        headerRow.innerHTML = `
+        <th class="text-left py-2">Trade</th>
+        <th class="text-left py-2">GW</th>
+        <th class="text-left py-2">Winner</th>
+        <th class="text-right py-2">Net Points</th>`;
+
+        if (byTrade.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-500">
+        No trades with impact yet.
+      </td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = byTrade.map(trade => {
+          const label = trade.participants.map(p => p.team).join(' ↔ ');
+          const winnerTeam = trade.winner ? trade.winner.team : '—';
+          const net = trade.net || 0;
+          const cls = net >= 0 ? 'text-green-500' : 'text-red-500';
+          const sign = net >= 0 ? '+' : '';
+          const gwText = trade.gameweek ? `GW${trade.gameweek}` : '—';
+          const detailText = trade.participants.map(p => `${p.team}: ${p.points.toFixed(1)} pts`).join(' • ');
+          return `
+      <tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+          data-trade-id="${trade.id}"
+          data-gw="${targetGW}">
+        <td class="py-2">
+          <div class="font-semibold">${label}</div>
+          <div class="text-xs text-gray-500">${detailText}</div>
+        </td>
+        <td class="py-2">${gwText}</td>
+        <td class="py-2 font-semibold">${winnerTeam}</td>
+        <td class="py-2 text-right font-bold ${cls}">${sign}${net.toFixed(1)}</td>
+      </tr>
+      `;
+        }).join('');
+
+        tbody.querySelectorAll('tr[data-trade-id]').forEach(row => {
+          row.addEventListener('click', () => {
+            const tradeId = row.getAttribute('data-trade-id');
+            const gwAttr = parseInt(row.getAttribute('data-gw'), 10);
+            const gwValue = isNaN(gwAttr) ? targetGW : gwAttr;
+            showTradeComparisonDetails(tradeId, gwValue);
+          });
+        });
+        return;
+      }
+
+      const rows = Object.entries(byTeam)
+        .map(([team, d]) => ({ team, pts: d.netPoints }))
+        .filter(r => r.pts !== 0)
+        .sort((a, b) => b.pts - a.pts);
+
+      headerRow.innerHTML = `
+      <th class="text-left py-2">Rank</th>
+      <th class="text-left py-2">Team</th>
+      <th class="text-right py-2">Trade Impact</th>`;
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-gray-500">
+      No trades with impact yet.
+    </td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map((r, i) => {
+        const cls = r.pts >= 0 ? 'text-green-500' : 'text-red-500';
+        const sign = r.pts >= 0 ? '+' : '';
+        const encodedTeam = encodeURIComponent(r.team);
+        return `
+<tr class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+    data-team="${encodedTeam}"
+    data-gw="${targetGW}">
+        <td>${i + 1}</td>
+        <td>${r.team}</td>
+        <td class="text-right font-bold ${cls}">${sign}${r.pts.toFixed(1)}</td>
+      </tr>
+    `;
+      }).join('');
+
+      tbody.querySelectorAll('tr[data-team]').forEach(row => {
+        row.addEventListener('click', () => {
+          const teamName = decodeURIComponent(row.getAttribute('data-team') || '');
+          const gwAttr = parseInt(row.getAttribute('data-gw'), 10);
+          const gwValue = isNaN(gwAttr) ? targetGW : gwAttr;
+          showTradeImpactDetails(teamName, gwValue);
+        });
+      });
+
+      updateTradeImpactViewButtons();
+    }
+
+    function setTradeImpactViewMode(mode) {
+      tradeImpactViewMode = mode;
+      updateTradeImpactViewButtons();
+      const selectedGW = parseInt(document.getElementById('gameweek-selector').value);
+      if (!isNaN(selectedGW)) {
+        renderTradeImpact(selectedGW);
+      }
+    }
+
+    function updateTradeImpactViewButtons() {
+      const teamBtn = document.getElementById('trade-view-team');
+      const tradeBtn = document.getElementById('trade-view-trade');
+      if (!teamBtn || !tradeBtn) return;
+
+      const activeClasses = ['bg-blue-600', 'text-white', 'dark:bg-blue-500', 'dark:text-white'];
+      const inactiveClasses = ['bg-gray-100', 'text-gray-600', 'dark:bg-gray-700', 'dark:text-gray-200'];
+
+      if (tradeImpactViewMode === 'team') {
+        teamBtn.classList.remove(...inactiveClasses);
+        teamBtn.classList.add(...activeClasses);
+        tradeBtn.classList.remove(...activeClasses);
+        tradeBtn.classList.add(...inactiveClasses);
+      } else {
+        tradeBtn.classList.remove(...inactiveClasses);
+        tradeBtn.classList.add(...activeClasses);
+        teamBtn.classList.remove(...activeClasses);
+        teamBtn.classList.add(...inactiveClasses);
+      }
+    }
+
+    function buildOriginalRosters() {
+      originalRosterByTeam = {};
+      draftClaimMoves = [];
+      (draftResults || []).forEach(row => {
+        const team = (row['Fantasy Team'] || '').trim();
+        const playerName = (row['Player'] || '').trim();
+        if (!team || !playerName) return;
+        if (!originalRosterByTeam[team]) {
+          originalRosterByTeam[team] = [];
+        }
+        originalRosterByTeam[team].push({
+          playerName,
+          playerKey: normalizeName(playerName)
+        });
+        draftClaimMoves.push({
+          Player: playerName,
+          Type: 'claim',
+          Gameweek: 0,
+          Manager: team,
+          __source: 'draft'
+        });
+      });
+    }
+
+    function buildRosterSnapshot(targetGW) {
+      const roster = {};
+      Object.entries(ownershipTimeline).forEach(([playerKey, windows]) => {
+        windows.forEach(window => {
+          const start = parseInt(window.startGW);
+          const end = parseInt(window.endGW);
+          if (isNaN(start) || isNaN(end)) return;
+          if (targetGW >= start && targetGW <= end) {
+            if (!roster[window.team]) {
+              roster[window.team] = new Set();
+            }
+            roster[window.team].add(playerKey);
+          }
+        });
+      });
+      return roster;
+    }
+
+    function renderOriginalRosterRetention(targetGW) {
+      const tbody = document.getElementById('original-retention-body');
+      if (!tbody) return;
+
+      if (!targetGW || isNaN(targetGW) || Object.keys(originalRosterByTeam).length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Draft results unavailable.</td></tr>`;
+        return;
+      }
+
+      if (!ownershipTimeline || Object.keys(ownershipTimeline).length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Roster data unavailable.</td></tr>`;
+        return;
+      }
+
+      const currentRoster = buildRosterSnapshot(targetGW);
+      const rows = Object.entries(originalRosterByTeam).map(([team, players]) => {
+        const currentSet = currentRoster[team] || new Set();
+        const retainedPlayers = players
+          .filter(p => currentSet.has(p.playerKey))
+          .map(p => p.playerName);
+        return {
+          team,
+          retained: retainedPlayers.length,
+          total: players.length,
+          players: retainedPlayers
+        };
+      }).sort((a, b) => b.retained - a.retained || a.team.localeCompare(b.team));
+
+      tbody.innerHTML = rows.map(row => {
+        const percentage = row.total > 0 ? ((row.retained / row.total) * 100).toFixed(0) : '0';
+        return `
+      <tr class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+          data-team="${encodeURIComponent(row.team)}"
+          data-players="${encodeURIComponent(JSON.stringify(row.players))}"
+          data-total="${row.total}"
+          data-retained="${row.retained}">
+        <td class="py-2 font-semibold">${row.team}</td>
+        <td class="py-2">${row.retained}/${row.total} <span class="text-xs text-gray-500">(${percentage}%)</span></td>
+      </tr>`;
+      }).join('');
+
+      tbody.querySelectorAll('tr[data-team]').forEach(row => {
+        row.addEventListener('click', () => {
+          const team = decodeURIComponent(row.getAttribute('data-team'));
+          const retained = parseInt(row.getAttribute('data-retained'), 10);
+          const total = parseInt(row.getAttribute('data-total'), 10);
+          const players = JSON.parse(decodeURIComponent(row.getAttribute('data-players')));
+          showOriginalRosterModal({ team, retained, total, players });
+        });
+      });
+    }
+
 
     function calculateStandings() {
       const teamStats = {};
       matchData.forEach(match => {
         const team = match.Team;
         if (!teamStats[team]) { teamStats[team] = { wins: 0, losses: 0, pointsFor: 0, pointsAgainst: 0, games: 0 }; }
-        teamStats[team].games++;
+        if (!isNaN(parseFloat(match.Score))) {
+          teamStats[team].games++;
+        }
         teamStats[team].pointsFor += parseFloat(match.Score);
         teamStats[team].pointsAgainst += parseFloat(match.Opp_Score);
         if (match.Result === 'W') teamStats[team].wins++; else teamStats[team].losses++;
@@ -256,20 +965,20 @@
         return parseFloat(b.avgScore) - parseFloat(a.avgScore);
       });
     }
-    
+
     function renderStandings(selectedTeams) {
-        if (matchData.length === 0) return;
-        const fullStandings = calculateStandings();
-        const tbody = document.getElementById('standings-body');
-        tbody.innerHTML = '';
-        
-        fullStandings.forEach((team, index) => {
-            const isSelected = selectedTeams.includes(team.team);
-            const row = document.createElement('tr');
-            row.className = `border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${isSelected ? 'bg-blue-500/10 dark:bg-blue-400/10' : ''}`;
-            row.innerHTML = `<td class="py-2 font-semibold">${index + 1}</td><td class="py-2">${team.team}</td><td class="py-2 text-green-600 font-semibold">${team.wins}</td><td class="py-2 text-red-600 font-semibold">${team.losses}</td><td class="py-2">${team.pointsFor}</td><td class="py-2">${team.pointsAgainst}</td><td class="py-2 font-semibold">${team.avgScore}</td>`;
-            tbody.appendChild(row);
-        });
+      if (matchData.length === 0) return;
+      const fullStandings = calculateStandings();
+      const tbody = document.getElementById('standings-body');
+      tbody.innerHTML = '';
+
+      fullStandings.forEach((team, index) => {
+        const isSelected = selectedTeams.includes(team.team);
+        const row = document.createElement('tr');
+        row.className = `border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${isSelected ? 'bg-blue-500/10 dark:bg-blue-400/10' : ''}`;
+        row.innerHTML = `<td class="py-2 font-semibold">${index + 1}</td><td class="py-2">${team.team}</td><td class="py-2 text-green-600 font-semibold">${team.wins}</td><td class="py-2 text-red-600 font-semibold">${team.losses}</td><td class="py-2">${team.pointsFor}</td><td class="py-2">${team.pointsAgainst}</td><td class="py-2 font-semibold">${team.avgScore}</td>`;
+        tbody.appendChild(row);
+      });
     }
 
 
@@ -281,7 +990,7 @@
       teams.forEach((team, index) => {
         const div = document.createElement('div');
         div.className = 'flex items-center space-x-2';
-        const isChecked = index < 4 ? 'checked' : ''; 
+        const isChecked = index < 4 ? 'checked' : '';
         div.innerHTML = `<input type="checkbox" id="team-${index}" value="${team}" ${isChecked} onchange="updateLeagueView()" class="rounded text-blue-600"><label for="team-${index}" class="text-sm truncate">${team}</label>`;
         container.appendChild(div);
       });
@@ -299,38 +1008,38 @@
     }
 
     function createChart(id, type, options) {
-        const ctx = document.getElementById(id).getContext('2d');
-        return new Chart(ctx, { type, data: { labels: [], datasets: [] }, options });
+      const ctx = document.getElementById(id).getContext('2d');
+      return new Chart(ctx, { type, data: { labels: [], datasets: [] }, options });
     }
 
     function createScoreTrendsChart() { charts.scoreTrends = createChart('score-trends-chart', 'line', { responsive: true, plugins: { legend: { labels: { color: '#9CA3AF' } } }, scales: { x: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }, y: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } } } }); }
     function createWinTrendsChart() { charts.winTrends = createChart('win-trends-chart', 'line', { responsive: true, plugins: { legend: { labels: { color: '#9CA3AF' } } }, scales: { x: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }, y: { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } } } }); }
     function createWinRateChart() { charts.winRate = createChart('win-rate-chart', 'doughnut', { responsive: true, plugins: { legend: { position: 'right', labels: { color: '#9CA3AF' } } } }); }
-    function createPerformanceMatrixChart() { 
-        charts.performanceMatrix = createChart('performance-matrix-chart', 'scatter', { 
-            responsive: true, 
-            plugins: { 
-                legend: { labels: { color: '#9CA3AF' } },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.dataset.label || '';
-                            const avgScore = context.parsed.x.toFixed(1);
-                            const winRate = context.parsed.y.toFixed(1);
-                            return `${label}: (Avg Score: ${avgScore}, Win Rate: ${winRate}%)`;
-                        }
-                    }
-                }
-            }, 
-            scales: { 
-                x: { title: { display: true, text: 'Average Score', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }, 
-                y: { title: { display: true, text: 'Win Rate (%)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } } 
-            } 
-        }); 
+    function createPerformanceMatrixChart() {
+      charts.performanceMatrix = createChart('performance-matrix-chart', 'scatter', {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: '#9CA3AF' } },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.dataset.label || '';
+                const avgScore = context.parsed.x.toFixed(1);
+                const winRate = context.parsed.y.toFixed(1);
+                return `${label}: (Avg Score: ${avgScore}, Win Rate: ${winRate}%)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { title: { display: true, text: 'Average Score', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } },
+          y: { title: { display: true, text: 'Win Rate (%)', color: '#9CA3AF' }, ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } }
+        }
+      });
     }
-    
+
     function updateLeagueView() {
-      if(Object.keys(charts).length === 0) return;
+      if (Object.keys(charts).length === 0) return;
       const selectedTeams = Array.from(document.querySelectorAll('#team-checkboxes input[type="checkbox"]:checked')).map(cb => cb.value);
       updateScoreLineChart(selectedTeams);
       updateWinTrendsChart(selectedTeams);
@@ -338,45 +1047,60 @@
       updatePerformanceMatrixChart(selectedTeams);
       renderStandings(selectedTeams);
     }
-    
+
     function updateScoreLineChart(selectedTeams) {
-        const chartType = document.getElementById('score-chart-selector').value;
-        document.getElementById('score-chart-title').innerText = chartType === 'weekly' ? 'Score Trends by Gameweek' : 'Cumulative Score Trends';
-        const gameweeks = [...new Set(matchData.map(match => parseInt(match.Gameweek)))].sort((a, b) => a - b);
-        let datasets = [];
-        if (chartType === 'weekly') {
-            datasets = selectedTeams.map(team => ({ label: team, data: gameweeks.map(gw => (matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw) || {}).Score || null), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.4 }));
-        } else {
-            datasets = selectedTeams.map(team => {
-                let cumulativeScore = 0;
-                return { label: team, data: gameweeks.map(gw => { cumulativeScore += parseFloat((matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw) || {}).Score || 0); return cumulativeScore.toFixed(2); }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.4 };
-            });
-        }
-        charts.scoreTrends.data = { labels: gameweeks.map(gw => `GW${gw}`), datasets };
-        charts.scoreTrends.update();
+      const chartType = document.getElementById('score-chart-selector').value;
+      document.getElementById('score-chart-title').innerText = chartType === 'weekly' ? 'Score Trends by Gameweek' : 'Cumulative Score Trends';
+      const filteredMatches = getFilteredMatchData();
+      const gameweeks = [...new Set(filteredMatches.map(m => parseInt(m.Gameweek)))].sort((a, b) => a - b);
+      let datasets = [];
+      if (chartType === 'weekly') {
+        datasets = selectedTeams.map(team => ({
+          label: team,
+          data: gameweeks.map(gw => {
+            const match = filteredMatches.find(m => m.Team === team && parseInt(m.Gameweek) === gw);
+            return match ? parseFloat(match.Score) : null;
+          }),
+          borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.4
+        }));
+      } else {
+        datasets = selectedTeams.map(team => {
+          let cumulativeScore = 0;
+          return {
+            label: team, data: gameweeks.map(gw => {
+              const match = filteredMatches.find(m => m.Team === team && parseInt(m.Gameweek) === gw);
+              if (match) cumulativeScore += parseFloat(match.Score) || 0;
+              return cumulativeScore.toFixed(2);
+            }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.4
+          };
+        });
+      }
+      charts.scoreTrends.data = { labels: gameweeks.map(gw => `GW${gw}`), datasets };
+      charts.scoreTrends.update();
     }
-    
+
     function updateWinTrendsChart(selectedTeams) {
-        const chartType = document.getElementById('win-trends-selector').value;
-        document.getElementById('win-trends-title').innerText = chartType === 'cumulative' ? 'Cumulative Wins by Gameweek' : 'Match Results by Gameweek';
-        const gameweeks = [...new Set(matchData.map(match => parseInt(match.Gameweek)))].sort((a, b) => a - b);
-        let datasets = [], yAxisOptions = { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } };
-        if (chartType === 'cumulative') {
-            yAxisOptions.ticks.stepSize = 1;
-            datasets = selectedTeams.map(team => {
-                let winCount = 0;
-                return { label: team, data: gameweeks.map(gw => { const match = matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw); if (match && match.Result === 'W') winCount++; return winCount; }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.1, stepped: true };
-            });
-        } else {
-            yAxisOptions.ticks = { color: '#9CA3AF', stepSize: 1, callback: v => (v === 1 ? 'Win' : v === 0 ? 'Loss' : null) };
-            yAxisOptions.min = -0.1; yAxisOptions.max = 1.1;
-            datasets = selectedTeams.map(team => ({ label: team, data: gameweeks.map(gw => { const match = matchData.find(m => m.Team === team && parseInt(m.Gameweek) === gw); return match ? (match.Result === 'W' ? 1 : 0) : null; }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', stepped: true }));
-        }
-        charts.winTrends.options.scales.y = yAxisOptions;
-        charts.winTrends.data = { labels: gameweeks.map(gw => `GW${gw}`), datasets };
-        charts.winTrends.update();
+      const chartType = document.getElementById('win-trends-selector').value;
+      document.getElementById('win-trends-title').innerText = chartType === 'cumulative' ? 'Cumulative Wins by Gameweek' : 'Match Results by Gameweek';
+      const filteredMatches = getFilteredMatchData();
+      const gameweeks = [...new Set(filteredMatches.map(m => parseInt(m.Gameweek)))].sort((a, b) => a - b);
+      let datasets = [], yAxisOptions = { ticks: { color: '#9CA3AF' }, grid: { color: '#374151' } };
+      if (chartType === 'cumulative') {
+        yAxisOptions.ticks.stepSize = 1;
+        datasets = selectedTeams.map(team => {
+          let winCount = 0;
+          return { label: team, data: gameweeks.map(gw => { const match = filteredMatches.find(m => m.Team === team && parseInt(m.Gameweek) === gw); if (match && match.Result === 'W') winCount++; return winCount; }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', tension: 0.1, stepped: true };
+        });
+      } else {
+        yAxisOptions.ticks = { color: '#9CA3AF', stepSize: 1, callback: v => (v === 1 ? 'Win' : v === 0 ? 'Loss' : null) };
+        yAxisOptions.min = -0.1; yAxisOptions.max = 1.1;
+        datasets = selectedTeams.map(team => ({ label: team, data: gameweeks.map(gw => { const match = filteredMatches.find(m => m.Team === team && parseInt(m.Gameweek) === gw); return match ? (match.Result === 'W' ? 1 : 0) : null; }), borderColor: getTeamColor(team), backgroundColor: getTeamColor(team) + '20', stepped: true }));
+      }
+      charts.winTrends.options.scales.y = yAxisOptions;
+      charts.winTrends.data = { labels: gameweeks.map(gw => `GW${gw}`), datasets };
+      charts.winTrends.update();
     }
-    
+
     function updateWinRateChart(selectedTeams) {
       const winRates = selectedTeams.map(team => {
         const teamMatches = matchData.filter(match => match.Team === team);
@@ -387,7 +1111,7 @@
       charts.winRate.data.datasets[0] = { data: winRates, backgroundColor: selectedTeams.map(team => getTeamColor(team)) };
       charts.winRate.update();
     }
-    
+
     function updatePerformanceMatrixChart(selectedTeams) {
       const datasets = selectedTeams.map(team => {
         const teamMatches = matchData.filter(match => match.Team === team);
@@ -402,472 +1126,1394 @@
     }
 
     function populateGameweekSelector() {
-        const selector = document.getElementById('gameweek-selector');
-        selector.innerHTML = '';
-        const availableGameweeks = Object.keys(weeklyPlayerData).sort((a,b) => b-a);
-        if (availableGameweeks.length === 0) {
-            selector.innerHTML = `<option>No Data</option>`;
-            return;
-        }
-        availableGameweeks.forEach(gw => {
-            const option = document.createElement('option');
-            option.value = gw;
-            option.textContent = `Gameweek ${gw}`;
-            selector.appendChild(option);
-        });
+      const selector = document.getElementById('gameweek-selector');
+      selector.innerHTML = '';
+      const availableGameweeks = Object.keys(weeklyPlayerData).sort((a, b) => b - a);
+      if (availableGameweeks.length === 0) {
+        selector.innerHTML = `<option>No Data</option>`;
+        return;
+      }
+      availableGameweeks.forEach(gw => {
+        const option = document.createElement('option');
+        option.value = gw;
+        option.textContent = `Gameweek ${gw}`;
+        selector.appendChild(option);
+      });
     }
 
     function calculateSeasonTotals() {
-        const playerTotals = {};
-        const numericColumns = ['FPts', 'GP', 'GS', 'Min', 'G', 'KP', 'AT', 'SOT', 'TklW', 'DIS', 'YC', 'RC', 'Pen', 'ACNC', 'Int', 'CLR', 'OG', 'CS', 'AER', 'SBON', 'SBCF', 'PKM', 'PKD', 'GA', 'GC', 'S'];
-        Object.values(weeklyPlayerData).forEach(weeklyData => {
-            weeklyData.forEach(player => {
-                const name = player.Player;
-                if (!playerTotals[name]) {
-                    playerTotals[name] = { ...player };
-                    numericColumns.forEach(col => playerTotals[name][col] = 0);
-                }
-                numericColumns.forEach(col => {
-                    const value = parseFloat(player[col]);
-                    if (!isNaN(value)) { playerTotals[name][col] += value; }
-                });
-            });
+      const playerTotals = {};
+      const numericColumns = ['FPts', 'GP', 'GS', 'Min', 'G', 'KP', 'AT', 'SOT', 'TklW', 'DIS', 'YC', 'RC', 'Pen', 'ACNC', 'Int', 'CLR', 'OG', 'CS', 'AER', 'SBON', 'SBCF', 'PKM', 'PKD', 'GA', 'GC', 'S'];
+      Object.values(weeklyPlayerData).forEach(weeklyData => {
+        weeklyData.forEach(player => {
+          const name = player.Player;
+          if (!playerTotals[name]) {
+            playerTotals[name] = { ...player };
+            numericColumns.forEach(col => playerTotals[name][col] = 0);
+          }
+          numericColumns.forEach(col => {
+            const value = parseFloat(player[col]);
+            if (!isNaN(value)) { playerTotals[name][col] += value; }
+          });
         });
-        Object.values(playerTotals).forEach(player => {
-            if (player.GP > 0) { player['FP/G'] = (player.FPts / player.GP).toFixed(1); } else { player['FP/G'] = 0; }
-        });
-        return Object.values(playerTotals);
+      });
+      Object.values(playerTotals).forEach(player => {
+        if (player.GP > 0) { player['FP/G'] = (player.FPts / player.GP).toFixed(1); } else { player['FP/G'] = 0; }
+      });
+      return Object.values(playerTotals);
     }
 
     function calculateAndRenderImmediateGWImpact(targetGW) {
-        if (Object.keys(weeklyPlayerData).length === 0 || transactionData.length === 0) { return; }
+      if (Object.keys(weeklyPlayerData).length === 0 || transactionData.length === 0) { return; }
 
-        detailedImpactData = {};
-        const allTeams = [...new Set(matchData.map(m => m.Team))];
-        allTeams.forEach(team => detailedImpactData[team] = { netPoints: 0, transactions: [] });
-        
-        const weeklyTransactions = transactionData.filter(t => parseInt(t.Gameweek) === targetGW);
-        const weeklyScores = weeklyPlayerData[targetGW];
-        const tbody = document.getElementById('immediate-impact-body');
+      detailedImpactData = {};
+      const allTeams = [...new Set(matchData.map(m => m.Team))];
+      allTeams.forEach(team => detailedImpactData[team] = { netPoints: 0, transactions: [] });
 
-        if (!weeklyScores) {
-            tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No player data available for GW${targetGW}.</td></tr>`;
-            return;
+      const weeklyTransactions = allMoves.filter(
+        t =>
+          parseInt(t.Gameweek) === targetGW &&
+          parseInt(t.Gameweek) <= CURRENT_GAMEWEEK
+      );
+
+      const weeklyScores = weeklyPlayerData[targetGW];
+      const tbody = document.getElementById('immediate-impact-body');
+
+      if (!weeklyScores) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No player data available for GW${targetGW}.</td></tr>`;
+        return;
+      }
+      weeklyTransactions.forEach(t => {
+        const teamName =
+          (t.Manager || t.Team_1 || t['Team.1'] || t.Team2 || '').trim();
+
+        const playerName = t.Player ? t.Player.trim() : null;
+        const type = t.Type ? t.Type.toLowerCase() : null;
+
+        // 🚨 Missing critical fields
+        if (!teamName) {
+          console.warn('[Immediate Impact] Missing team name', t);
+          return;
         }
 
-        weeklyTransactions.forEach(t => {
-            const teamName = t.Manager ? t.Manager.trim() : null;
-            const playerName = t.Player ? t.Player.trim() : null;
-            const type = t.Type ? t.Type.toLowerCase() : null;
+        if (!playerName) {
+          console.warn('[Immediate Impact] Missing player name', t);
+          return;
+        }
 
-            if (!teamName || !playerName) return;
+        if (!type || (type !== 'claim' && type !== 'drop')) {
+          console.warn('[Immediate Impact] Unknown transaction type', t);
+          return;
+        }
 
-            const playerStats = weeklyScores.find(p => p.Player && p.Player.trim().toLowerCase() === playerName.toLowerCase());
-            const actualPoints = playerStats ? (parseFloat(playerStats['FPts']) || 0) : 0;
+        // 🚨 Team not recognised in league
+        if (!detailedImpactData.hasOwnProperty(teamName)) {
+          console.warn('[Immediate Impact] Team not found in league data:', teamName, t);
+          return;
+        }
 
-            if (detailedImpactData.hasOwnProperty(teamName)) {
-                let impact = 0;
-                if (type === 'claim') {
-                    impact = actualPoints;
-                } else if (type === 'drop') {
-                    impact = -actualPoints;
-                }
-                
-                if (impact !== 0) {
-                    detailedImpactData[teamName].netPoints += impact;
-                     detailedImpactData[teamName].transactions.push({
-                        playerName: t.Player, type: t.Type, points: impact, transactionGW: targetGW
-                    });
-                }
-            }
+        const playerStats = weeklyScores.find(
+          p => normalizeName(p.Player) === normalizeName(playerName)
+        );
+
+        // 🚨 Player didn’t score / didn’t appear this GW
+        if (!playerStats) {
+          console.warn(
+            `[Immediate Impact] Player not found in GW${targetGW} scores`,
+            { teamName, playerName, transaction: t }
+          );
+          return;
+        }
+
+        const actualPoints = parseFloat(playerStats['FPts']) || 0;
+
+        if (actualPoints === 0) {
+          console.warn(
+            `[Immediate Impact] Player scored 0 points`,
+            { teamName, playerName, transaction: t }
+          );
+          return;
+        }
+
+        const impact = type === 'claim' ? actualPoints : -actualPoints;
+
+        detailedImpactData[teamName].netPoints += impact;
+        detailedImpactData[teamName].transactions.push({
+          playerName,
+          type,
+          points: impact,
+          transactionGW: targetGW
         });
+      });
 
-        const sortedImpact = Object.entries(detailedImpactData)
-            .filter(([,data]) => data.transactions.length > 0)
-            .sort(([,a],[,b]) => b.netPoints - a.netPoints);
 
-        if (sortedImpact.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No transactions with an impact for GW${targetGW}.</td></tr>`;
-            return;
-        }
+      const sortedImpact = Object.entries(detailedImpactData)
+        .filter(([, data]) => data.transactions.length > 0)
+        .sort(([, a], [, b]) => b.netPoints - a.netPoints);
 
-        tbody.innerHTML = sortedImpact.map(([team, data], index) => {
-            const netPoints = data.netPoints;
-            const colorClass = netPoints > 0 ? 'text-green-500' : 'text-red-500';
-            const sign = netPoints > 0 ? '+' : '';
-            return `<tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showImpactDetails('${team}', ${targetGW})">
+      if (sortedImpact.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No transactions with an impact for GW${targetGW}.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = sortedImpact.map(([team, data], index) => {
+        const netPoints = data.netPoints;
+        const colorClass = netPoints > 0 ? 'text-green-500' : 'text-red-500';
+        const sign = netPoints > 0 ? '+' : '';
+        return `<tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showImpactDetails('${team}', ${targetGW})">
                         <td class="py-2 font-semibold">${index + 1}</td>
                         <td class="py-2">${team}</td>
                         <td class="py-2 font-bold ${colorClass}">${sign}${netPoints.toFixed(1)}</td>
                     </tr>`;
-        }).join('');
+      }).join('');
+    }
+    function sumPlayerPoints(playerKey, fromGW, toGW) {
+      let total = 0;
+      for (let gw = fromGW; gw <= toGW; gw++) {
+        const map = weeklyIndex[String(gw)];
+        if (!map) continue;
+        total += map.get(playerKey) || 0;
+      }
+      return total;
     }
 
-function calculateAndRenderCumulativeImpact(targetGW) {
-    cumulativeDetailedImpactData = {}; // Reset data
-    const allTeams = [...new Set(matchData.map(m => m.Team))];
-    allTeams.forEach(team => {
-        cumulativeDetailedImpactData[team] = { netPoints: 0, claims: [], drops: [] };
-    });
+    function calculateAndRenderCumulativeImpact(targetGW) {
+      cumulativeDetailedImpactData = {};
+      const allTeams = [...new Set(matchData.map(m => m.Team))];
 
-    const relevantTransactions = transactionData.filter(t => parseInt(t.Gameweek) <= targetGW);
+      // Initialise teams
+      allTeams.forEach(team => {
+        cumulativeDetailedImpactData[team] = {
+          netPoints: 0,
+          claims: [],
+          drops: []
+        };
+      });
 
-    relevantTransactions.forEach(t => {
-        const teamName = t.Manager ? t.Manager.trim() : null;
-        if (!teamName || !cumulativeDetailedImpactData.hasOwnProperty(teamName)) return;
+      /* ============================================================
+         1) POINTS GAINED — only while player was actually owned
+         ============================================================ */
+      Object.entries(ownershipTimeline).forEach(([playerKey, windows]) => {
+        windows.forEach(w => {
+          const team = w.team;
+          if (!cumulativeDetailedImpactData[team]) return;
 
-        const transactionGW = parseInt(t.Gameweek);
-        const playerName = t.Player ? t.Player.trim() : null;
-        const type = t.Type ? t.Type.toLowerCase() : null;
-        if (!playerName || !type) return;
+          const start = Math.max(parseInt(w.startGW), 1);
+          const end = Math.min(parseInt(w.endGW), targetGW, CURRENT_GAMEWEEK);
+          if (start > end) return;
 
-        let pointImpact = 0;
-        for (let gw = transactionGW; gw <= targetGW; gw++) {
-            const weeklyScores = weeklyPlayerData[gw];
-            if (!weeklyScores) continue;
-            const playerStats = weeklyScores.find(p => p.Player && p.Player.trim().toLowerCase() === playerName.toLowerCase());
-            pointImpact += playerStats ? (parseFloat(playerStats['FPts']) || 0) : 0;
+          const pts = sumPlayerPoints(playerKey, start, end);
+          if (pts === 0) return;
+
+          cumulativeDetailedImpactData[team].netPoints += pts;
+          cumulativeDetailedImpactData[team].claims.push({
+            playerName: w.playerName || playerKey,
+            transactionGW: start,
+            pointImpact: pts
+          });
+        });
+      });
+
+      /* ============================================================
+         2) POINTS MISSED — after a real drop, until next reclaim
+         ============================================================ */
+      Object.entries(playerEvents).forEach(([playerKey, events]) => {
+        for (let i = 0; i < events.length; i++) {
+          const e = events[i];
+          if (e.type !== 'drop') continue;
+
+          const team = e.team;
+          if (!cumulativeDetailedImpactData[team]) continue;
+
+          // Was this a REAL ownership drop?
+          const hadOwnership = ownershipTimeline[playerKey]?.some(
+            w => w.team === team && w.endGW === e.gw - 1
+          );
+          if (!hadOwnership) continue;
+
+          // Find next claim by SAME team
+          let nextClaimGW = null;
+          for (let j = i + 1; j < events.length; j++) {
+            if (events[j].type === 'claim' && events[j].team === team) {
+              nextClaimGW = events[j].gw;
+              break;
+            }
+          }
+
+          const start = Math.max(e.gw, 1);
+          const end = Math.min(
+            nextClaimGW ? nextClaimGW - 1 : targetGW,
+            targetGW,
+            CURRENT_GAMEWEEK
+          );
+          if (start > end) continue;
+
+          const missed = sumPlayerPoints(playerKey, start, end);
+          if (missed === 0) continue;
+
+          cumulativeDetailedImpactData[team].netPoints -= missed;
+          cumulativeDetailedImpactData[team].drops.push({
+            playerName: e.playerName || playerKey,
+            transactionGW: e.gw,
+            pointImpact: missed
+          });
         }
+      });
 
-        if (type === 'claim') {
-            cumulativeDetailedImpactData[teamName].netPoints += pointImpact;
-            cumulativeDetailedImpactData[teamName].claims.push({ playerName, transactionGW, pointImpact });
-        } else if (type === 'drop') {
-            cumulativeDetailedImpactData[teamName].netPoints -= pointImpact;
-            cumulativeDetailedImpactData[teamName].drops.push({ playerName, transactionGW, pointImpact });
-        }
-    });
+      /* ============================================================
+         3) RENDER TABLE
+         ============================================================ */
+      const sortedImpacts = Object.entries(cumulativeDetailedImpactData)
+        .map(([team, data]) => ({ team, netPoints: data.netPoints }))
+        .filter(d => d.netPoints !== 0)
+        .sort((a, b) => b.netPoints - a.netPoints);
 
-const sortedImpacts = Object.entries(cumulativeDetailedImpactData)
-    .map(([team, data]) => ({ team, netPoints: data.netPoints }))
-    .filter(data => data.netPoints !== 0) // Add this line
-    .sort((a, b) => b.netPoints - a.netPoints);
-    
-    const tbody = document.getElementById('cumulative-impact-body');
-    tbody.innerHTML = sortedImpacts.map((data, index) => {
-        const colorClass = data.netPoints >= 0 ? 'text-green-500' : 'text-red-500';
-        const sign = data.netPoints >= 0 ? '+' : '';
-        // Add the onclick event to the table row
-        return `<tr class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer" onclick="showCumulativeImpactDetails('${data.team}', ${targetGW})">
-                    <td class="py-2 font-semibold">${index + 1}</td>
-                    <td class="py-2">${data.team}</td>
-                    <td class="py-2 font-bold ${colorClass}">${sign}${data.netPoints.toFixed(1)}</td>
-                </tr>`;
-    }).join('');
-}
+      const tbody = document.getElementById('cumulative-impact-body');
 
-function showCumulativeImpactDetails(teamName, targetGW) {
-    const data = cumulativeDetailedImpactData[teamName];
-    if (!data) return;
+      if (sortedImpacts.length === 0) {
+        tbody.innerHTML = `
+      <tr>
+        <td colspan="3" class="py-4 text-center text-gray-500">
+          No cumulative impact to show up to GW${targetGW}.
+        </td>
+      </tr>`;
+        return;
+      }
 
-    document.getElementById('cumulative-modal-title').innerText = `Cumulative Impact Details for ${teamName} (up to GW${targetGW})`;
-    const claimsBody = document.getElementById('claims-body');
-    const dropsBody = document.getElementById('drops-body');
-    
-    // Sort claims by most points gained
-    data.claims.sort((a, b) => b.pointImpact - a.pointImpact);
-    // Sort drops by most points missed
-    data.drops.sort((a, b) => b.pointImpact - a.pointImpact);
+      tbody.innerHTML = sortedImpacts.map((d, idx) => {
+        const colorClass = d.netPoints >= 0 ? 'text-green-500' : 'text-red-500';
+        const sign = d.netPoints >= 0 ? '+' : '';
+        return `
+      <tr class="border-b border-gray-100 dark:border-gray-700
+                 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+          onclick="showCumulativeImpactDetails('${d.team}', ${targetGW})">
+        <td class="py-2 font-semibold">${idx + 1}</td>
+        <td class="py-2">${d.team}</td>
+        <td class="py-2 font-bold ${colorClass}">
+          ${sign}${d.netPoints.toFixed(1)}
+        </td>
+      </tr>`;
+      }).join('');
+    }
 
-    claimsBody.innerHTML = data.claims.length > 0 ? data.claims.map(t => `
+
+    function showCumulativeImpactDetails(teamName, targetGW) {
+      const data = cumulativeDetailedImpactData[teamName];
+      if (!data) return;
+
+      document.getElementById('cumulative-modal-title').innerText = `Cumulative Impact Details for ${teamName} (up to GW${targetGW})`;
+      const claimsBody = document.getElementById('claims-body');
+      const dropsBody = document.getElementById('drops-body');
+
+      // Sort claims by most points gained
+      data.claims.sort((a, b) => b.pointImpact - a.pointImpact);
+      // Sort drops by most points missed
+      data.drops.sort((a, b) => b.pointImpact - a.pointImpact);
+
+      claimsBody.innerHTML = data.claims.length > 0 ? data.claims.map(t => `
         <tr class="border-b border-gray-100 dark:border-gray-700">
             <td class="py-2">${t.playerName} (GW${t.transactionGW})</td>
             <td class="py-2 text-right font-semibold text-green-500">+${t.pointImpact.toFixed(1)}</td>
         </tr>`).join('') : `<tr><td colspan="2" class="py-2 text-gray-500">No claims made.</td></tr>`;
 
-    dropsBody.innerHTML = data.drops.length > 0 ? data.drops.map(t => `
+      dropsBody.innerHTML = data.drops.length > 0 ? data.drops.map(t => `
         <tr class="border-b border-gray-100 dark:border-gray-700">
             <td class="py-2">${t.playerName} (GW${t.transactionGW})</td>
             <td class="py-2 text-right font-semibold text-red-500">-${t.pointImpact.toFixed(1)}</td>
         </tr>`).join('') : `<tr><td colspan="2" class="py-2 text-gray-500">No drops made.</td></tr>`;
-    
-    document.getElementById('cumulative-impact-modal').classList.remove('hidden');
-}
 
-function hideCumulativeImpactDetails() {
-    document.getElementById('cumulative-impact-modal').classList.add('hidden');
-}
+      document.getElementById('cumulative-impact-modal').classList.remove('hidden');
+    }
+
+    function hideCumulativeImpactDetails() {
+      document.getElementById('cumulative-impact-modal').classList.add('hidden');
+    }
     function showImpactDetails(teamName, targetGW) {
-        const data = detailedImpactData[teamName];
-        if (!data) return;
+      const data = detailedImpactData[teamName];
+      if (!data) return;
 
-        const modalTitle = document.getElementById('modal-title');
-        const modalBody = document.getElementById('modal-body');
-        const modal = document.getElementById('impact-modal');
+      const modalTitle = document.getElementById('modal-title');
+      const modalBody = document.getElementById('modal-body');
+      const modal = document.getElementById('impact-modal');
 
-        modalTitle.innerText = `Immediate Impact Details for ${teamName} (GW${targetGW})`;
-        
-        const sortedTransactions = data.transactions.sort((a, b) => b.points - a.points);
+      modalTitle.innerText = `Immediate Impact Details for ${teamName} (GW${targetGW})`;
 
-        if (sortedTransactions.length === 0) {
-            modalBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No transactions with a point impact for this gameweek.</td></tr>`;
-        } else {
-            modalBody.innerHTML = sortedTransactions.map(t => {
-                const points = t.points;
-                const colorClass = points > 0 ? 'text-green-500' : 'text-red-500';
-                const sign = points > 0 ? '+' : '';
-                return `
+      const sortedTransactions = data.transactions.sort((a, b) => b.points - a.points);
+
+      if (sortedTransactions.length === 0) {
+        modalBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">No transactions with a point impact for this gameweek.</td></tr>`;
+      } else {
+        modalBody.innerHTML = sortedTransactions.map(t => {
+          const points = t.points;
+          const colorClass = points > 0 ? 'text-green-500' : 'text-red-500';
+          const sign = points > 0 ? '+' : '';
+          return `
                     <tr class="border-b border-gray-100 dark:border-gray-700">
                         <td class="py-2">${t.playerName}</td>
                         <td class="py-2">${t.type}</td>
                         <td class="py-2 font-semibold ${colorClass}">${sign}${points.toFixed(1)}</td>
                     </tr>`;
-            }).join('');
-        }
-        modal.classList.remove('hidden');
+        }).join('');
+      }
+      modal.classList.remove('hidden');
     }
 
     function hideImpactDetails() {
-        document.getElementById('impact-modal').classList.add('hidden');
+      document.getElementById('impact-modal').classList.add('hidden');
     }
-    
+
     function calculateAndRenderOverallImpact(targetGW) {
-        const scoresForGW = weeklyPlayerData[targetGW];
-        const tbody = document.getElementById('overall-impact-body');
+      const scoresForGW = weeklyPlayerData[targetGW];
+      const tbody = document.getElementById('overall-impact-body');
 
-        if (!scoresForGW || Object.keys(teamMappings).length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Roster or score data is missing for GW${targetGW}.</td></tr>`;
-            return;
+      if (!scoresForGW || Object.keys(teamMappings).length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-gray-500">Roster or score data is missing for GW${targetGW}.</td></tr>`;
+        return;
+      }
+
+      const teamTotals = {};
+      const allTeams = Object.values(teamMappings);
+      allTeams.forEach(team => teamTotals[team] = 0);
+
+      scoresForGW.forEach(player => {
+        const managerUsername = player.Status;
+        const managerName = teamMappings[managerUsername];
+        if (managerName && teamTotals.hasOwnProperty(managerName)) {
+          teamTotals[managerName] += parseFloat(player['FPts']) || 0;
         }
+      });
 
-        const teamTotals = {};
-        const allTeams = Object.values(teamMappings);
-        allTeams.forEach(team => teamTotals[team] = 0);
+      const teamTotalsArray = Object.entries(teamTotals)
+        .map(([team, totalPoints]) => ({ team, totalPoints }))
+        .sort((a, b) => b.totalPoints - a.totalPoints);
 
-        scoresForGW.forEach(player => {
-            const managerUsername = player.Status;
-            const managerName = teamMappings[managerUsername];
-            if (managerName && teamTotals.hasOwnProperty(managerName)) {
-                teamTotals[managerName] += parseFloat(player['FPts']) || 0;
-            }
-        });
-
-        const teamTotalsArray = Object.entries(teamTotals)
-            .map(([team, totalPoints]) => ({ team, totalPoints }))
-            .sort((a, b) => b.totalPoints - a.totalPoints);
-        
-        tbody.innerHTML = teamTotalsArray.map((data, index) => {
-            return `<tr class="border-b border-gray-100 dark:border-gray-700">
+      tbody.innerHTML = teamTotalsArray.map((data, index) => {
+        return `<tr class="border-b border-gray-100 dark:border-gray-700">
                         <td class="py-2 font-semibold">${index + 1}</td>
                         <td class="py-2">${data.team}</td>
                         <td class="py-2 font-bold">${data.totalPoints.toFixed(1)}</td>
                     </tr>`;
-        }).join('');
+      }).join('');
     }
+
+    function showTradeImpactDetails(teamName, targetGW) {
+      const data = tradeImpactByTeam[teamName];
+      if (!data) return;
+
+      document.getElementById('trade-modal-title').innerText =
+        `Trade Impact Details for ${teamName} (up to GW${targetGW})`;
+
+      const receivedBody = document.getElementById('trade-received-body');
+      const sentBody = document.getElementById('trade-sent-body');
+
+      // Sort for readability
+      data.received.sort((a, b) => b.pts - a.pts);
+      data.sent.sort((a, b) => b.pts - a.pts);
+
+      receivedBody.innerHTML = data.received.length
+        ? data.received.map(r => `
+        <tr class="border-b">
+          <td class="py-2">${r.player}</td>
+          <td class="py-2">${r.tradePartner || '—'}</td>
+          <td class="py-2 text-right text-green-500 font-semibold">
+            +${r.pts.toFixed(1)}
+          </td>
+        </tr>
+      `).join('')
+        : `<tr><td colspan="3" class="py-2 text-gray-500">No players received.</td></tr>`;
+
+      sentBody.innerHTML = data.sent.length
+        ? data.sent.map(s => `
+        <tr class="border-b">
+          <td class="py-2">${s.player}</td>
+          <td class="py-2">${s.tradePartner || '—'}</td>
+          <td class="py-2 text-right text-red-500 font-semibold">
+            -${s.pts.toFixed(1)}
+          </td>
+        </tr>
+      `).join('')
+        : `<tr><td colspan="3" class="py-2 text-gray-500">No players sent.</td></tr>`;
+
+      document.getElementById('trade-impact-modal').classList.remove('hidden');
+    }
+
+    function hideTradeImpactDetails() {
+      document.getElementById('trade-impact-modal').classList.add('hidden');
+    }
+
+    function showTradeComparisonDetails(tradeId, targetGW) {
+      const trade = tradeImpactByTrade.find(t => t.id === tradeId);
+      if (!trade) return;
+
+      const titleEl = document.getElementById('trade-comparison-title');
+      const metaEl = document.getElementById('trade-comparison-meta');
+      const bodyEl = document.getElementById('trade-comparison-body');
+
+      const tradeLabel = trade.participants.map(p => p.team).join(' ↔ ');
+      titleEl.innerText = `Trade Details: ${tradeLabel}`;
+
+      const metaBits = [];
+      if (trade.gameweek != null) metaBits.push(`Executed GW${trade.gameweek}`);
+      if (trade.dates && trade.dates.length > 0) {
+        const dateLabel = trade.dates.length === 1
+          ? trade.dates[0]
+          : `Dates: ${trade.dates.join(', ')}`;
+        metaBits.push(dateLabel);
+      } else if (trade.date) {
+        metaBits.push(trade.date);
+      }
+      metaBits.push(`Evaluated through GW${targetGW}`);
+      metaEl.innerText = metaBits.join(' • ');
+
+      const participantCards = trade.participants.map(p => {
+        const pointSign = p.points >= 0 ? '+' : '';
+        const totalClass = p.points >= 0 ? 'text-green-500' : 'text-red-500';
+        const rows = p.players.length
+          ? p.players.map(playerEntry => {
+            const playerSign = playerEntry.pts >= 0 ? '+' : '';
+            const playerCls = playerEntry.pts >= 0 ? 'text-green-500' : 'text-red-500';
+            const direction = playerEntry.pts >= 0 ? 'Received' : 'Sent';
+            return `
+              <tr class="border-b border-gray-100 dark:border-gray-700">
+                <td class="py-1">${playerEntry.player}</td>
+                <td class="py-1 text-center text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">${direction}</td>
+                <td class="py-1 text-right font-semibold ${playerCls}">
+                  ${playerSign}${playerEntry.pts.toFixed(1)}
+                </td>
+              </tr>`;
+          }).join('')
+          : `<tr><td colspan="3" class="py-2 text-gray-500">No points recorded for this team.</td></tr>`;
+
+        return `
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm">
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Team</p>
+              <p class="text-lg font-semibold">${p.team}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-gray-500 dark:text-gray-400">Net Points Since Trade</p>
+              <p class="text-xl font-bold ${totalClass}">${pointSign}${p.points.toFixed(1)}</p>
+            </div>
+          </div>
+        <table class="dashboard-table w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th class="text-left py-1">Player</th>
+                <th class="text-center py-1">Direction</th>
+                <th class="text-right py-1">Points Since Trade</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>`;
+      }).join('');
+
+      bodyEl.innerHTML = participantCards;
+      document.getElementById('trade-comparison-modal').classList.remove('hidden');
+    }
+
+    function hideTradeComparisonDetails() {
+      document.getElementById('trade-comparison-modal').classList.add('hidden');
+    }
+
+    function showOriginalRosterModal({ team, retained, total, players }) {
+      const modal = document.getElementById('original-roster-modal');
+      const title = document.getElementById('original-roster-title');
+      const stats = document.getElementById('original-roster-stats');
+      const list = document.getElementById('original-roster-list');
+
+      title.innerText = `Drafted Players Still on ${team}`;
+      stats.innerText = `${retained}/${total} original players remain`;
+
+      if (!players || players.length === 0) {
+        list.innerHTML = `<li class="py-2 text-gray-500">No original players remain.</li>`;
+      } else {
+        list.innerHTML = players.map(name => `<li class="py-2 border-b border-gray-800 last:border-b-0">${name}</li>`).join('');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function hideOriginalRosterModal() {
+      document.getElementById('original-roster-modal').classList.add('hidden');
+    }
+
 
     function updatePlayerView() {
-        const selectedGW = document.getElementById('gameweek-selector').value;
-        const statsViewType = document.getElementById('player-stats-selector').value;
-        let sourceData = [];
-        let title = "Player Statistics";
-        let kpiSuffix = "";
+      const selectedGW = document.getElementById('gameweek-selector').value;
+      const statsViewType = document.getElementById('player-stats-selector').value;
+      let sourceData = [];
+      let title = "Player Statistics";
+      let kpiSuffix = "";
 
-        if (statsViewType === 'weekly') {
-            sourceData = weeklyPlayerData[selectedGW] || [];
-            title = `Player Statistics (Gameweek ${selectedGW})`;
-            kpiSuffix = ` (Selected GW)`;
-        } else {
-            sourceData = seasonTotalPlayerData;
-            title = `Player Statistics (Season Total)`;
-            kpiSuffix = ` (Season Total)`;
+      if (statsViewType === 'weekly') {
+        sourceData = weeklyPlayerData[selectedGW] || [];
+        title = `Player Statistics (Gameweek ${selectedGW})`;
+        kpiSuffix = ` (Selected GW)`;
+      } else {
+        sourceData = seasonTotalPlayerData;
+        title = `Player Statistics (Season Total)`;
+        kpiSuffix = ` (Season Total)`;
+      }
+
+      document.getElementById('player-stats-title').innerText = title;
+      document.getElementById('top-scorer-label').innerText = `Top Scorer${kpiSuffix}`;
+      document.getElementById('avg-points-label').innerText = `Avg. Points${kpiSuffix}`;
+
+      if (sourceData.length === 0) {
+        ['total-players', 'top-scorer-name', 'avg-points'].forEach(id => document.getElementById(id).innerText = 'N/A');
+        document.getElementById('top-scorer-pts').innerText = '-- FPts';
+        if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().clear().draw(); }
+      } else {
+        document.getElementById('total-players').innerText = sourceData.length;
+        const topScorer = sourceData.reduce((a, b) => (parseFloat(a["FPts"] || 0) > parseFloat(b["FPts"] || 0)) ? a : b, { Player: 'N/A', FPts: 0 });
+        document.getElementById("top-scorer-name").innerText = topScorer["Player"];
+        document.getElementById("top-scorer-pts").innerText = `${parseFloat(topScorer["FPts"]).toFixed(1)} FPts`;
+        const avgPts = (sourceData.reduce((sum, p) => sum + parseFloat(p["FPts"] || 0), 0) / sourceData.length || 0).toFixed(1);
+        document.getElementById("avg-points").innerText = avgPts;
+
+        // Normalize rows so keepers + outfield players share the same schema
+        const normalizedData = sourceData.map(row => {
+          const normalized = {};
+          PLAYER_TABLE_COLUMNS.forEach(col => {
+            normalized[col] =
+              row[col] !== undefined && row[col] !== ''
+                ? row[col]
+                : 0;
+          });
+          return normalized;
+        });
+
+        if ($.fn.DataTable.isDataTable('#players-table')) {
+          $('#players-table').DataTable().destroy();
         }
 
-        document.getElementById('player-stats-title').innerText = title;
-        document.getElementById('top-scorer-label').innerText = `Top Scorer${kpiSuffix}`;
-        document.getElementById('avg-points-label').innerText = `Avg. Points${kpiSuffix}`;
-        
-        if (sourceData.length === 0) {
-            ['total-players', 'top-scorer-name', 'avg-points'].forEach(id => document.getElementById(id).innerText = 'N/A');
-            document.getElementById('top-scorer-pts').innerText = '-- FPts';
-            if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().clear().draw(); }
-        } else {
-            document.getElementById('total-players').innerText = sourceData.length;
-            const topScorer = sourceData.reduce((a, b) => (parseFloat(a["FPts"] || 0) > parseFloat(b["FPts"] || 0)) ? a : b, { Player: 'N/A', FPts: 0 });
-            document.getElementById("top-scorer-name").innerText = topScorer["Player"];
-            document.getElementById("top-scorer-pts").innerText = `${parseFloat(topScorer["FPts"]).toFixed(1)} FPts`;
-            const avgPts = (sourceData.reduce((sum, p) => sum + parseFloat(p["FPts"] || 0), 0) / sourceData.length || 0).toFixed(1);
-            document.getElementById("avg-points").innerText = avgPts;
+        $('#players-table').DataTable({
+          data: normalizedData,
+          columns: PLAYER_TABLE_COLUMNS.map(col => ({
+            title: col,
+            data: col
+          })),
+          pageLength: 10,
+          order: [[4, 'desc']], // FPts
+          responsive: true,
+          language: {
+            search: "Search players:",
+            lengthMenu: "Show _MENU_ players",
+            info: "Showing _START_ to _END_ of _TOTAL_ players"
+          }
+        });
+      }
 
-            if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().destroy(); }
-            $('#players-table').DataTable({
-                data: sourceData,
-                columns: (sourceData[0] ? Object.keys(sourceData[0]) : []).map(k => ({ title: k, data: k })),
-                pageLength: 10, order: [[6, 'desc']], responsive: true,
-                language: { search: "Search players:", lengthMenu: "Show _MENU_ players", info: "Showing _START_ to _END_ of _TOTAL_ players" }
-            });
-        }
-        
-        calculateAndRenderCumulativeImpact(parseInt(selectedGW));
-        calculateAndRenderImmediateGWImpact(parseInt(selectedGW));
-        calculateAndRenderOverallImpact(parseInt(selectedGW));
+      calculateAndRenderCumulativeImpact(parseInt(selectedGW));
+      calculateAndRenderImmediateGWImpact(parseInt(selectedGW));
+      calculateAndRenderOverallImpact(parseInt(selectedGW));
+      renderTradeImpact(parseInt(selectedGW));
+      renderOriginalRosterRetention(parseInt(selectedGW));
     }
-    
+
+    function buildOwnershipTimeline() {
+      ownershipTimeline = {};
+      playerCurrentOwner = {};
+      playerEvents = {};
+
+
+      const sortedTransactions = allMoves
+        .map(t => ({
+          playerKey: normalizeName(t.Player),
+          playerName: (t.Player || '').trim(),
+          team: (t.Manager || t.Team2 || t.Team_1 || t['Team.1'] || '').trim(),
+          type: (t.Type || '').toLowerCase(),
+          gw: parseInt(t.Gameweek)
+        }))
+
+        .filter(t => t.playerKey && t.team && !isNaN(t.gw))
+        .sort((a, b) => a.gw - b.gw);
+
+      sortedTransactions.forEach(t => {
+        const { playerKey, playerName, team, type, gw } = t;
+
+        if (!playerEvents[playerKey]) playerEvents[playerKey] = [];
+        playerEvents[playerKey].push({ gw, type, team, playerName });
+
+        if (!ownershipTimeline[playerKey]) {
+          ownershipTimeline[playerKey] = [];
+        }
+
+        if (!ownershipTimeline[playerKey]) {
+          ownershipTimeline[playerKey] = [];
+        }
+
+        if (type === 'claim') {
+          if (playerCurrentOwner[playerKey]) {
+            const prev = playerCurrentOwner[playerKey];
+            prev.endGW = gw - 1;
+            ownershipTimeline[playerKey].push(prev);
+          }
+
+          playerCurrentOwner[playerKey] = {
+            playerKey,
+            playerName,
+            team,
+            startGW: gw,
+            endGW: CURRENT_GAMEWEEK
+          };
+        }
+
+        if (type === 'drop') {
+          const current = playerCurrentOwner[playerKey];
+          if (current && current.team === team) {
+            current.endGW = gw - 1;
+            ownershipTimeline[playerKey].push(current);
+            delete playerCurrentOwner[playerKey];
+          }
+        }
+      });
+
+      Object.values(playerCurrentOwner).forEach(o => {
+        if (!ownershipTimeline[o.playerKey]) ownershipTimeline[o.playerKey] = [];
+        ownershipTimeline[o.playerKey].push(o);
+      });
+
+      Object.values(playerEvents).forEach(events =>
+        events.sort((a, b) => a.gw - b.gw)
+      );
+
+      console.log('[Ownership] Timeline built', ownershipTimeline);
+    }
+
+
     document.addEventListener("DOMContentLoaded", () => {
-        const filesToLoad = ['record.csv', 'transactions.csv', 'team_mapping.csv'];
+      updateTradeImpactViewButtons();
+      const filesToLoad = ['record.csv', 'transactions.csv', 'trades.csv', 'team_mapping.csv', 'draft_result.csv'];
       for (let i = 1; i <= MAX_GAMEWEEK; i++) {
         filesToLoad.push(`ref_gw${i}.csv`);
-         filesToLoad.push(`keepers_gw${i}.csv`);
+        filesToLoad.push(`keepers_gw${i}.csv`);
       }
-        const promises = filesToLoad.map(file => new Promise((resolve) => {
-            Papa.parse(file, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: results => resolve({ file, status: 'fulfilled', data: results.data }),
-                error: (err) => resolve({ file, status: 'rejected', error: err })
+      const promises = filesToLoad.map(file => new Promise((resolve) => {
+        Papa.parse(file, {
+          download: true, header: true, skipEmptyLines: true,
+          complete: results => resolve({ file, status: 'fulfilled', data: results.data }),
+          error: (err) => resolve({ file, status: 'rejected', error: err })
+        });
+      }));
+
+      Promise.all(promises).then(results => {
+        const getResult = (fileName) => results.find(r => r.file === fileName);
+        const recordResult = getResult('record.csv');
+        const transactionResult = getResult('transactions.csv');
+        const mappingResult = getResult('team_mapping.csv');
+        const tradesResult = getResult('trades.csv');
+        const draftResult = getResult('draft_result.csv');
+
+        if (tradesResult && tradesResult.status === 'fulfilled') {
+          tradesData = tradesResult.data;
+        } else {
+          console.error("CRITICAL: trades.csv failed to load.");
+          tradesData = [];
+        }
+        buildTradeGroups();
+
+        if (draftResult && draftResult.status === 'fulfilled') {
+          draftResults = draftResult.data;
+          buildOriginalRosters();
+        } else {
+          console.error("CRITICAL: draft_result.csv failed to load.");
+        }
+
+        if (recordResult && recordResult.status === 'fulfilled') {
+          matchData = recordResult.data
+            .filter(row => row.Team !== '*League Average*')
+            .map(row => {
+              const score = parseFloat(row.Score);
+              const oppScore = parseFloat(row.Opp_Score);
+
+              let result = 'L';
+              if (!isNaN(score) && !isNaN(oppScore)) {
+                if (score > oppScore) result = 'W';
+                else if (score === oppScore) result = 'T';
+              }
+
+              return {
+                ...row,
+                Result: result
+              };
             });
-        }));
 
-        Promise.all(promises).then(results => {
-            const getResult = (fileName) => results.find(r => r.file === fileName);
+          // Dynamically determine latest GW
+          const availableGWs = [...new Set(matchData.map(m => parseInt(m.Gameweek)))]
+            .filter(gw => !isNaN(gw))
+            .sort((a, b) => a - b);
 
-            const recordResult = getResult('record.csv');
-            const transactionResult = getResult('transactions.csv');
-            const mappingResult = getResult('team_mapping.csv');
+          const gwSelect = document.getElementById('current-gameweek');
+          gwSelect.innerHTML = '';
 
-            if (recordResult && recordResult.status === 'fulfilled') {
-                matchData = recordResult.data.filter(row => row.Team !== '*League Average*');
-            } else { console.error("CRITICAL: record.csv failed to load."); }
+          availableGWs.forEach(gw => {
+            const opt = document.createElement('option');
+            opt.value = gw;
+            opt.textContent = `GW ${gw}`;
+            gwSelect.appendChild(opt);
+          });
 
-            if (transactionResult && transactionResult.status === 'fulfilled') {
-                transactionData = transactionResult.data;
-            } else { console.error("CRITICAL: transactions.csv failed to load."); }
+          CURRENT_GAMEWEEK = Math.max(...availableGWs);
+          gwSelect.value = CURRENT_GAMEWEEK;
 
-            if (mappingResult && mappingResult.status === 'fulfilled') {
-                 teamMappings = Object.fromEntries(mappingResult.data.map(m => [m.Status, m.Team]));
-            } else { console.error("CRITICAL: team_mapping.csv failed to load."); }
 
-            weeklyPlayerData = {};
-            
-            // Helper to safely add rows
-            function addWeeklyData(gw, rows) {
-              if (!weeklyPlayerData[gw]) {
-                weeklyPlayerData[gw] = [];
-              }
-              weeklyPlayerData[gw].push(...rows);
-            }
-            
-            results.forEach(result => {
-              if (result.status !== 'fulfilled' || !result.data || result.data.length === 0) return;
-            
-              const match = result.file.match(/_gw(\d+)/);
-              if (!match) return;
-            
-              const gw = match[1];
-            
-              if (result.file.startsWith('ref_gw')) {
-                addWeeklyData(gw, result.data);
-              }
-            
-              if (result.file.startsWith('keepers_gw')) {
-                addWeeklyData(gw, result.data);
-              }
-            })
-          
-            const recentTransLog = document.getElementById('transaction-log-body');
-            if (transactionData.length > 0 && recentTransLog) {
-                const sortedTransactions = transactionData.sort((a,b) => new Date(b['Date (BST)']) - new Date(a['Date (BST)']));
-                recentTransLog.innerHTML = sortedTransactions.slice(0, 50).map(t => {
-                    return `<tr class="border-b border-gray-100 dark:border-gray-700">
+        } else { console.error("CRITICAL: record.csv failed to load."); }
+
+        if (transactionResult && transactionResult.status === 'fulfilled') {
+          transactionData = transactionResult.data;
+        } else { console.error("CRITICAL: transactions.csv failed to load."); }
+
+        if (mappingResult && mappingResult.status === 'fulfilled') {
+          teamMappings = Object.fromEntries(mappingResult.data.map(m => [m.Status, m.Team]));
+        } else { console.error("CRITICAL: team_mapping.csv failed to load."); }
+
+        weeklyPlayerData = {};
+
+        // Helper to safely add rows
+        function addWeeklyData(gw, rows) {
+          if (!weeklyPlayerData[gw]) {
+            weeklyPlayerData[gw] = [];
+          }
+          weeklyPlayerData[gw].push(...rows);
+        }
+
+        results.forEach(result => {
+          if (result.status !== 'fulfilled' || !result.data || result.data.length === 0) return;
+
+          const match = result.file.match(/_gw(\d+)/);
+          if (!match) return;
+
+          const gw = match[1];
+
+          if (result.file.startsWith('ref_gw')) {
+            addWeeklyData(gw, result.data);
+          }
+
+          if (result.file.startsWith('keepers_gw')) {
+            addWeeklyData(gw, result.data);
+          }
+        })
+        buildWeeklyIndex();
+
+        // IMPORTANT: build unified move stream FIRST
+        allMoves = buildUnifiedMoves();
+
+        console.log(
+          '[Moves check]',
+          'trades rows =', tradesData.length,
+          'trade moves =', allMoves.filter(m => m.__source === 'trade').length,
+          'total moves =', allMoves.length
+        );
+
+        // NOW build ownership & playerEvents from allMoves
+        buildOwnershipTimeline();
+
+        console.log(
+          'Weekly index built for GWs:',
+          Object.keys(weeklyIndex).sort((a, b) => a - b)
+        );
+
+        const recentTransLog = document.getElementById('transaction-log-body');
+        if (transactionData.length > 0 && recentTransLog) {
+          const sortedTransactions = transactionData.sort((a, b) => new Date(b['Date (BST)']) - new Date(a['Date (BST)']));
+          recentTransLog.innerHTML = sortedTransactions.slice(0, 50).map(t => {
+            return `<tr class="border-b border-gray-100 dark:border-gray-700">
                                 <td class="py-2">${t.Player}</td>
                                 <td class="py-2">${t.Type}</td>
                                 <td class="py-2">${t.Manager}</td>
                                 <td class="py-2">${t.Gameweek}</td>
                             </tr>`;
-                }).join('');
-            }
+          }).join('');
+        }
 
-                    // 🔍 DEBUG: confirm players per gameweek (including keepers)
-          Object.keys(weeklyPlayerData)
-            .sort((a, b) => a - b)
-            .forEach(gw => {
-              console.log(
-                `GW${gw}: ${weeklyPlayerData[gw].length} total players`,
-                weeklyPlayerData[gw]
-              );
-            });
+        // 🔍 DEBUG: confirm players per gameweek (including keepers)
+        Object.keys(weeklyPlayerData)
+          .sort((a, b) => a - b)
+          .forEach(gw => {
+            console.log(
+              `GW${gw}: ${weeklyPlayerData[gw].length} total players`,
+              weeklyPlayerData[gw]
+            );
+          });
 
-            seasonTotalPlayerData = calculateSeasonTotals();
-            populateGameweekSelector();
-            
-            document.getElementById('loading-message').classList.add('hidden');
-            document.getElementById('main-content').classList.remove('hidden');
+        seasonTotalPlayerData = calculateSeasonTotals();
+        populateGameweekSelector();
 
-            showSection('league');
-            updatePlayerView(); 
-        });
+        document.getElementById('loading-message').classList.add('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
+
+        showSection('league');
+        updatePlayerView();
+      });
     });
-</script>
 
-<style>
-    .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate { color: #9CA3AF; }
-    .dataTables_wrapper .dataTables_paginate .paginate_button { color: #9CA3AF !important; }
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: #374151 !important; border-color: #374151 !important; }
-    .dataTables_wrapper table.dataTable tbody tr { background-color: transparent; }
-    .dataTables_wrapper table.dataTable tbody tr:hover { background-color: rgba(55, 65, 81, 0.5) !important; }
-    .section-content { transition: opacity 0.3s ease-in-out; }
-    .section-content.hidden { opacity: 0; display: none; }
-    input[type="checkbox"] { accent-color: #3B82F6; }
-    canvas { max-height: 300px !important; }
-    @media (max-width: 1024px) { #performance-matrix-chart { max-height: 400px !important; } }
-</style>
+    function auditPlayerImpactForTeam(playerName, teamName) {
+      const playerKey = normalizeName(playerName);
+      const windows = ownershipTimeline[playerKey];
 
-<div id="impact-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-    <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-      <h3 id="modal-title" class="text-xl font-bold">Transaction Details</h3>
-      <button onclick="hideImpactDetails()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </button>
-    </div>
-    <div class="p-6 overflow-y-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b border-gray-200 dark:border-gray-700">
-            <th class="text-left py-2">Player</th>
-            <th class="text-left py-2">Transaction Type</th>
-            <th class="text-left py-2">Points Impact</th>
-          </tr>
-        </thead>
-        <tbody id="modal-body">
+      if (!windows) {
+        console.log(`❌ No ownership data for ${playerName}`);
+        return;
+      }
+
+      console.log(`🔍 Auditing ${playerName} for ${teamName}`);
+      console.log('Ownership windows:', windows);
+
+      let total = 0;
+
+      for (let gw = 1; gw <= CURRENT_GAMEWEEK; gw++) {
+        const owned = windows.some(
+          w => w.team === teamName && w.startGW <= gw && w.endGW >= gw
+        );
+
+        const pts = weeklyIndex[String(gw)]?.get(playerKey) || 0;
+
+        if (owned && pts !== 0) {
+          console.log(`✅ GW${gw}: OWNED → +${pts.toFixed(1)}`);
+          total += pts;
+        } else if (!owned && pts !== 0) {
+          console.log(`🚫 GW${gw}: NOT OWNED → ${pts.toFixed(1)} (ignored)`);
+        }
+      }
+
+      console.log(`🎯 TOTAL credited to ${teamName}: ${total.toFixed(1)} pts`);
+    }
+
+  </script>
+
+  <style>
+    :root {
+      --ui-bg: #f4f6fb;
+      --ui-surface: #ffffff;
+      --ui-surface-elevated: #ffffff;
+      --ui-border: rgba(15, 23, 42, 0.12);
+      --ui-border-strong: rgba(15, 23, 42, 0.25);
+      --ui-text-muted: #4b5563;
+      --ui-accent: #2563eb;
+      --ui-accent-strong: #1d4ed8;
+      --ui-card-text: #0f172a;
+      --ui-card-subtext: #475569;
+    }
+
+    [data-theme="dark"] {
+      --ui-bg: #050b18;
+      --ui-surface: #0f182b;
+      --ui-surface-elevated: #15223b;
+      --ui-border: rgba(148, 163, 184, 0.25);
+      --ui-border-strong: rgba(148, 163, 184, 0.4);
+      --ui-text-muted: #9ba7c1;
+      --ui-accent: #38bdf8;
+      --ui-accent-strong: #0ea5e9;
+      --ui-card-text: #f8fafc;
+      --ui-card-subtext: #cbd5f5;
+    }
+
+    body.app-body {
+      background-color: var(--ui-bg);
+      color: #0f172a;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    [data-theme="dark"] body.app-body {
+      color: #e2e8f0;
+    }
+
+    .app-header {
+      background: linear-gradient(120deg, #dbeafe 0%, #fef3c7 100%);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+      border-bottom: 1px solid var(--ui-border);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    [data-theme="dark"] .app-header {
+      background: linear-gradient(120deg, #0f172a 0%, #1b2545 100%);
+      box-shadow: 0 18px 40px rgba(2, 6, 23, 0.75);
+    }
+
+    .app-header h1 {
+      color: var(--ui-card-text);
+    }
+
+    [data-theme="dark"] .app-header h1 {
+      color: #f8fafc;
+    }
+
+    [data-theme="dark"] .bg-gray-800,
+    [data-theme="dark"] .bg-white {
+      background-color: var(--ui-surface) !important;
+    }
+
+    [data-theme="dark"] .border-gray-200,
+    [data-theme="dark"] .border-gray-700 {
+      border-color: var(--ui-border) !important;
+    }
+
+    .dashboard-card {
+      background: var(--ui-surface);
+      border: 1px solid var(--ui-border);
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    [data-theme="dark"] .dashboard-card {
+      box-shadow: 0 20px 40px rgba(2, 6, 23, 0.55);
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 30px 50px rgba(8, 20, 46, 0.18);
+    }
+
+    [data-theme="dark"] .dashboard-card:hover {
+      box-shadow: 0 30px 50px rgba(8, 20, 46, 0.65);
+    }
+
+    .dashboard-card h2,
+    .dashboard-card h3 {
+      color: var(--ui-card-text);
+    }
+
+    .dashboard-card p,
+    .dashboard-card td,
+    .dashboard-card th {
+      color: var(--ui-card-subtext);
+    }
+
+    .dashboard-modal {
+      background: var(--ui-surface-elevated) !important;
+      border: 1px solid var(--ui-border-strong);
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+      transition: background 0.3s ease;
+    }
+
+    [data-theme="dark"] .dashboard-modal {
+      box-shadow: 0 40px 80px rgba(2, 6, 23, 0.8);
+    }
+
+    .dashboard-modal h3,
+    .dashboard-modal h4 {
+      color: var(--ui-card-text);
+    }
+
+    .dashboard-modal p,
+    .dashboard-modal td,
+    .dashboard-modal th {
+      color: var(--ui-card-subtext);
+    }
+
+    .bg-blue-600,
+    [data-theme="dark"] .bg-blue-600 {
+      background: linear-gradient(120deg, var(--ui-accent), var(--ui-accent-strong)) !important;
+      color: #031226 !important;
+      border-color: transparent !important;
+    }
+
+    .text-blue-600,
+    [data-theme="dark"] .text-blue-400 {
+      color: var(--ui-accent) !important;
+    }
+
+    .border-blue-600,
+    [data-theme="dark"] .border-blue-400 {
+      border-color: var(--ui-accent) !important;
+    }
+
+    .nav-btn {
+      color: var(--ui-text-muted) !important;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .nav-btn.text-blue-600 {
+      color: var(--ui-card-text) !important;
+    }
+
+    [data-theme="dark"] .nav-btn.text-blue-600,
+    .nav-btn.dark\:text-blue-400 {
+      color: #f8fafc !important;
+    }
+
+    #trade-view-team,
+    #trade-view-trade {
+      border: 1px solid var(--ui-border) !important;
+      background-color: rgba(148, 163, 184, 0.08);
+      color: var(--ui-text-muted) !important;
+    }
+
+    #trade-view-team.bg-blue-600,
+    #trade-view-trade.bg-blue-600 {
+      color: #031226 !important;
+      box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
+    }
+
+    #theme-toggle {
+      background-color: rgba(255, 255, 255, 0.7);
+      color: #0f172a;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      box-shadow: 0 6px 12px rgba(15, 23, 42, 0.1);
+    }
+
+    #theme-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    [data-theme="dark"] #theme-toggle {
+      background-color: rgba(15, 23, 42, 0.6);
+      color: #f8fafc;
+      border-color: rgba(148, 163, 184, 0.25);
+      box-shadow: 0 8px 18px rgba(2, 6, 23, 0.75);
+    }
+
+    [data-theme="dark"] #theme-toggle:hover {
+      background-color: rgba(15, 23, 42, 0.8);
+    }
+
+    select,
+    input,
+    textarea {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid var(--ui-border);
+      color: #0f172a;
+      border-radius: 0.5rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    select:focus,
+    input:focus,
+    textarea:focus {
+      border-color: var(--ui-accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+      outline: none;
+    }
+
+    [data-theme="dark"] select,
+    [data-theme="dark"] input,
+    [data-theme="dark"] textarea {
+      background-color: rgba(15, 23, 42, 0.85);
+      border-color: var(--ui-border);
+      color: #f8fafc;
+    }
+
+    .dashboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.925rem;
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--ui-border);
+      color: var(--ui-card-text);
+    }
+
+    .dashboard-table thead th {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      color: var(--ui-text-muted);
+      background-color: rgba(148, 163, 184, 0.18);
+    }
+
+    [data-theme="dark"] .dashboard-table thead th {
+      color: var(--ui-card-subtext);
+      background-color: rgba(148, 163, 184, 0.08);
+    }
+
+    .dashboard-table tbody tr:hover {
+      background-color: rgba(37, 99, 235, 0.08);
+    }
+
+    [data-theme="dark"] .dashboard-table tbody tr:hover {
+      background-color: rgba(14, 165, 233, 0.12);
+    }
+
+    .dashboard-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .dashboard-table .text-green-500,
+    .dashboard-table .text-green-600 {
+      color: #059669 !important;
+    }
+
+    [data-theme="dark"] .dashboard-table .text-green-500,
+    [data-theme="dark"] .dashboard-table .text-green-600 {
+      color: #34d399 !important;
+    }
+
+    .dashboard-table .text-red-500,
+    .dashboard-table .text-red-600 {
+      color: #dc2626 !important;
+    }
+
+    [data-theme="dark"] .dashboard-table .text-red-500,
+    [data-theme="dark"] .dashboard-table .text-red-600 {
+      color: #f87171 !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input,
+    .dataTables_wrapper .dataTables_length select {
+      border-radius: 9999px;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--ui-border);
+      background-color: rgba(255, 255, 255, 0.85);
+      color: var(--ui-card-text);
+    }
+
+    [data-theme="dark"] .dataTables_wrapper .dataTables_filter input,
+    [data-theme="dark"] .dataTables_wrapper .dataTables_length select {
+      background-color: rgba(15, 23, 42, 0.85);
+      color: #f8fafc;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      border-radius: 9999px !important;
+      border: 1px solid transparent !important;
+      padding: 0.25rem 0.75rem !important;
+      color: var(--ui-text-muted) !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      border-color: var(--ui-accent) !important;
+      color: var(--ui-card-text) !important;
+      background: linear-gradient(120deg, var(--ui-accent), var(--ui-accent-strong)) !important;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+      color: var(--ui-text-muted);
+      font-size: 0.8rem;
+    }
+
+    .dataTables_wrapper .dataTables_filter label,
+    .dataTables_wrapper .dataTables_length label {
+      color: var(--ui-text-muted);
+      font-size: 0.8rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .dashboard-grid--summary {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .dashboard-grid--metrics {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .analysis-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+
+    .charts-grid canvas {
+      max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .analysis-grid {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding-bottom: 0.5rem;
+        scroll-snap-type: x proximity;
+      }
+
+      .analysis-grid .dashboard-card {
+        min-width: calc(100% - 1.5rem);
+        scroll-snap-align: start;
+      }
+
+      .analysis-grid::-webkit-scrollbar {
+        height: 6px;
+      }
+
+      .analysis-grid::-webkit-scrollbar-thumb {
+        background-color: rgba(148, 163, 184, 0.5);
+        border-radius: 9999px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .dashboard-grid--summary {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .dashboard-grid--metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+  </style>
+
+  <div id="impact-modal"
+    class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+    <div class="dashboard-modal bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 id="modal-title" class="text-xl font-bold">Transaction Details</h3>
+        <button onclick="hideImpactDetails()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto">
+        <table class="dashboard-table w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-2">Player</th>
+              <th class="text-left py-2">Transaction Type</th>
+              <th class="text-left py-2">Points Impact</th>
+            </tr>
+          </thead>
+          <tbody id="modal-body">
           </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-<div id="cumulative-impact-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
-  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col">
-    <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-      <h3 id="cumulative-modal-title" class="text-xl font-bold">Cumulative Impact Details</h3>
-      <button onclick="hideCumulativeImpactDetails()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </button>
-    </div>
-    <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <h4 class="text-lg font-semibold mb-2 text-green-500">Players Claimed (Points Gained)</h4>
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-gray-200 dark:border-gray-700">
-              <th class="text-left py-2">Player (Claimed GW)</th>
-              <th class="text-right py-2">Points Since Claim</th>
-            </tr>
-          </thead>
-          <tbody id="claims-body"></tbody>
-        </table>
-      </div>
-      <div>
-        <h4 class="text-lg font-semibold mb-2 text-red-500">Players Dropped (Points Missed)</h4>
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="border-b border-gray-200 dark:border-gray-700">
-              <th class="text-left py-2">Player (Dropped GW)</th>
-              <th class="text-right py-2">Points Since Drop</th>
-            </tr>
-          </thead>
-          <tbody id="drops-body"></tbody>
         </table>
       </div>
     </div>
   </div>
-</div>
+
+  <div id="cumulative-impact-modal"
+    class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+    <div class="dashboard-modal bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 id="cumulative-modal-title" class="text-xl font-bold">Cumulative Impact Details</h3>
+        <button onclick="hideCumulativeImpactDetails()"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="text-lg font-semibold mb-2 text-green-500">Players Claimed (Points Gained)</h4>
+          <table class="dashboard-table w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th class="text-left py-2">Player (Claimed GW)</th>
+                <th class="text-right py-2">Points Since Claim</th>
+              </tr>
+            </thead>
+            <tbody id="claims-body"></tbody>
+          </table>
+        </div>
+        <div>
+          <h4 class="text-lg font-semibold mb-2 text-red-500">Players Dropped (Points Missed)</h4>
+          <table class="dashboard-table w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th class="text-left py-2">Player (Dropped GW)</th>
+                <th class="text-right py-2">Points Since Drop</th>
+              </tr>
+            </thead>
+            <tbody id="drops-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="trade-impact-modal"
+    class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+    <div class="dashboard-modal bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 id="trade-modal-title" class="text-xl font-bold">Trade Impact Details</h3>
+        <button onclick="hideTradeImpactDetails()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          ✕
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 class="text-lg font-semibold mb-2 text-green-500">
+              Players Received (Points Gained)
+            </h4>
+            <table class="dashboard-table w-full text-sm">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-2">Player</th>
+                  <th class="text-left py-2">From Team</th>
+                  <th class="text-right py-2">Points</th>
+                </tr>
+              </thead>
+              <tbody id="trade-received-body"></tbody>
+            </table>
+          </div>
+          <div>
+            <h4 class="text-lg font-semibold mb-2 text-red-500">
+              Players Sent (Points Lost)
+            </h4>
+            <table class="dashboard-table w-full text-sm">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-2">Player</th>
+                  <th class="text-left py-2">To Team</th>
+                  <th class="text-right py-2">Points</th>
+                </tr>
+              </thead>
+              <tbody id="trade-sent-body"></tbody>
+            </table>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="trade-comparison-modal"
+    class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+    <div class="dashboard-modal bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+        <div>
+          <h3 id="trade-comparison-title" class="text-xl font-bold">Trade Details</h3>
+          <p id="trade-comparison-meta" class="text-sm text-gray-500 dark:text-gray-400"></p>
+        </div>
+        <button onclick="hideTradeComparisonDetails()"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="trade-comparison-body" class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+      </div>
+    </div>
+  </div>
+
+  <div id="original-roster-modal"
+    class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+    <div class="dashboard-modal bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+        <div>
+          <h3 id="original-roster-title" class="text-xl font-bold">Original Roster</h3>
+          <p id="original-roster-stats" class="text-sm text-gray-500 dark:text-gray-400"></p>
+        </div>
+        <button onclick="hideOriginalRosterModal()"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto">
+        <ul id="original-roster-list" class="space-y-1 text-sm"></ul>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
