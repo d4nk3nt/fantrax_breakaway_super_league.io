@@ -155,6 +155,79 @@
           </div>
         </div>
 
+        <div class="mb-8">
+          <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div>
+                <h3 class="text-xl font-bold">Player Comparison Lab</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                  Type any two players to benchmark them with a weighted metric engine that blends fantasy points,
+                  efficiency and defensive contributions for the currently selected data set.
+                </p>
+              </div>
+              <div class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                Powered by composite impact scoring
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
+              <div id="player-compare-left-card" class="comparison-panel">
+                <label for="player-compare-left" class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Player A</label>
+                <input id="player-compare-left" list="player-compare-options" type="text"
+                  class="mt-2 w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900"
+                  placeholder="Start typing a player name" autocomplete="off" />
+                <p id="player-compare-left-feedback" class="text-xs text-gray-500 mt-1">Start typing a player name</p>
+                <div id="player-compare-left-body" class="comparison-panel-body">
+                  <p class="text-sm text-gray-500">Waiting for a player selection...</p>
+                </div>
+              </div>
+
+              <div id="player-compare-summary" class="comparison-panel comparison-panel--summary">
+                <p class="text-sm text-gray-500">Composite Comparison Engine</p>
+                <p class="text-lg font-semibold mt-2">Pick two players</p>
+                <p class="text-xs text-gray-400 mt-4">
+                  This module ranks players using weighted fantasy metrics so you can justify tight trade calls with data.
+                </p>
+              </div>
+
+              <div id="player-compare-right-card" class="comparison-panel">
+                <label for="player-compare-right" class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Player B</label>
+                <input id="player-compare-right" list="player-compare-options" type="text"
+                  class="mt-2 w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900"
+                  placeholder="Start typing a player name" autocomplete="off" />
+                <p id="player-compare-right-feedback" class="text-xs text-gray-500 mt-1">Start typing a player name</p>
+                <div id="player-compare-right-body" class="comparison-panel-body">
+                  <p class="text-sm text-gray-500">Waiting for a player selection...</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="text-lg font-semibold mb-3">Stat Breakdown</h4>
+              <div class="overflow-x-auto">
+                <table class="dashboard-table w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th class="text-left py-2">Metric</th>
+                      <th class="text-left py-2">Player A</th>
+                      <th class="text-left py-2">Player B</th>
+                      <th class="text-left py-2">Edge</th>
+                    </tr>
+                  </thead>
+                  <tbody id="player-compare-table-body">
+                    <tr>
+                      <td colspan="4" class="py-4 text-center text-gray-500">
+                        Select two players above to reveal the head-to-head math.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <datalist id="player-compare-options"></datalist>
+        </div>
+
         <div class="analysis-grid mb-8" id="team-impact-grid">
           <div class="dashboard-card bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
             <h3 class="text-xl font-bold mb-4">Cumulative Transaction Impact</h3>
@@ -385,6 +458,21 @@
     ];
     let detailedImpactData = {};
     let cumulativeDetailedImpactData = {};
+    const COMPARISON_METRICS = [
+      { key: 'FPts', label: 'Fantasy Points', weight: 0.35, direction: 'desc' },
+      { key: 'FP/G', label: 'FPts per Game', weight: 0.2, direction: 'desc' },
+      { key: 'G', label: 'Goals', weight: 0.12, direction: 'desc' },
+      { key: 'A', label: 'Assists', weight: 0.12, direction: 'desc' },
+      { key: 'CS', label: 'Clean Sheets', weight: 0.08, direction: 'desc' },
+      { key: 'S', label: 'Saves', weight: 0.05, direction: 'desc' },
+      { key: 'GA', label: 'Goals Allowed', weight: 0.05, direction: 'asc' },
+      { key: 'Min', label: 'Minutes', weight: 0.03, direction: 'desc' }
+    ];
+    let comparisonSourceData = [];
+    let comparisonLookup = new Map();
+    let comparisonMetricRanges = {};
+    let comparisonSelections = { left: null, right: null };
+    let comparisonContextLabel = '';
 
     let teamMappings = {};
     const MAX_GAMEWEEK = 15;
@@ -1641,6 +1729,365 @@
       document.getElementById('original-roster-modal').classList.add('hidden');
     }
 
+    function setupComparisonInputs() {
+      ['left', 'right'].forEach(side => {
+        const input = document.getElementById(`player-compare-${side}`);
+        if (!input) return;
+        input.addEventListener('change', event => selectComparisonPlayer(side, event.target.value));
+        input.addEventListener('blur', event => selectComparisonPlayer(side, event.target.value));
+        input.addEventListener('keyup', event => {
+          if (event.key === 'Enter') {
+            selectComparisonPlayer(side, event.target.value);
+            event.target.blur();
+          }
+        });
+        updateComparisonInputStatus(side, 'Start typing a player name', 'muted');
+      });
+    }
+
+    function updateComparisonDataset(rows, statsViewType, selectedGW) {
+      comparisonSourceData = (rows || []).filter(r => r && r.__playerKey);
+      comparisonLookup = new Map();
+      comparisonSourceData.forEach(row => {
+        comparisonLookup.set(row.__playerKey, row);
+      });
+
+      comparisonMetricRanges = {};
+      COMPARISON_METRICS.forEach(metric => {
+        const values = comparisonSourceData
+          .map(r => parseFloat(r[metric.key]))
+          .filter(v => !isNaN(v));
+        if (values.length === 0) {
+          comparisonMetricRanges[metric.key] = null;
+          return;
+        }
+        comparisonMetricRanges[metric.key] = {
+          min: Math.min(...values),
+          max: Math.max(...values)
+        };
+      });
+
+      comparisonContextLabel = statsViewType === 'weekly'
+        ? `Gameweek ${selectedGW || '--'}`
+        : 'Season Total';
+
+      populateComparisonDatalist(comparisonSourceData.map(r => r.Player).filter(Boolean));
+
+      ['left', 'right'].forEach(side => {
+        const key = comparisonSelections[side];
+        if (key && !comparisonLookup.has(key)) {
+          comparisonSelections[side] = null;
+          const input = document.getElementById(`player-compare-${side}`);
+          if (input) input.value = '';
+          updateComparisonInputStatus(side, 'Player unavailable for this view', 'error');
+        }
+      });
+
+      renderComparison();
+    }
+
+    function populateComparisonDatalist(names) {
+      const datalist = document.getElementById('player-compare-options');
+      if (!datalist) return;
+      const uniqueNames = Array.from(new Set(names)).sort((a, b) => a.localeCompare(b));
+      datalist.innerHTML = uniqueNames.map(name => `<option value="${name}"></option>`).join('');
+    }
+
+    function selectComparisonPlayer(side, rawValue) {
+      const input = document.getElementById(`player-compare-${side}`);
+      const value = (rawValue || '').trim();
+      if (!value) {
+        comparisonSelections[side] = null;
+        if (input) input.value = '';
+        updateComparisonInputStatus(side, 'Start typing a player name', 'muted');
+        renderComparison();
+        return;
+      }
+
+      const match = matchPlayerName(value);
+      if (match && match.row) {
+        comparisonSelections[side] = match.row.__playerKey;
+        if (input) input.value = match.row.Player;
+        updateComparisonInputStatus(side, `Using ${match.row.Player}`, 'success', match.score);
+      } else {
+        comparisonSelections[side] = null;
+        updateComparisonInputStatus(side, 'Player not found in this data set', 'error');
+      }
+      renderComparison();
+    }
+
+    function matchPlayerName(input) {
+      const query = normalizeName(input);
+      if (!query) return null;
+
+      if (comparisonLookup.has(query)) {
+        return { row: comparisonLookup.get(query), score: 1 };
+      }
+
+      let bestMatch = null;
+      comparisonSourceData.forEach(row => {
+        const key = row.__playerKey;
+        if (!key) return;
+
+        let score = 0;
+        if (key.includes(query)) {
+          const ratio = query.length / key.length;
+          score = 0.65 + (ratio * 0.35);
+        } else {
+          score = stringSimilarity(key, query);
+        }
+
+        if (!bestMatch || score > bestMatch.score) {
+          bestMatch = { row, score };
+        }
+      });
+
+      if (bestMatch && bestMatch.score >= 0.5) {
+        return bestMatch;
+      }
+      return null;
+    }
+
+    function stringSimilarity(a, b) {
+      if (!a || !b) return 0;
+      const maxLen = Math.max(a.length, b.length);
+      if (maxLen === 0) return 1;
+      const distance = levenshteinDistance(a, b);
+      return 1 - distance / maxLen;
+    }
+
+    function levenshteinDistance(a, b) {
+      if (a === b) return 0;
+      const matrix = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+      for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+      for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j - 1] + cost
+          );
+        }
+      }
+      return matrix[a.length][b.length];
+    }
+
+    function updateComparisonInputStatus(side, message, tone = 'muted', confidence) {
+      const el = document.getElementById(`player-compare-${side}-feedback`);
+      if (!el) return;
+      el.classList.remove('text-gray-500', 'text-green-500', 'text-red-500');
+      const toneClass = tone === 'success' ? 'text-green-500'
+        : tone === 'error' ? 'text-red-500'
+          : 'text-gray-500';
+      el.classList.add(toneClass);
+
+      let text = message || 'Start typing a player name';
+      if (tone === 'success' && typeof confidence === 'number' && confidence < 1) {
+        text += ` • Confidence ${(confidence * 100).toFixed(0)}%`;
+      }
+      el.textContent = text;
+    }
+
+    function buildComparisonProfile(selectionKey) {
+      if (!selectionKey) return null;
+      const row = comparisonLookup.get(selectionKey);
+      if (!row) return null;
+      const stats = {};
+      COMPARISON_METRICS.forEach(metric => {
+        stats[metric.key] = row[metric.key];
+      });
+      return {
+        key: selectionKey,
+        label: row.Player,
+        team: row.Team,
+        position: row.Position,
+        status: row.Status,
+        stats,
+        score: calculateCompositeScore(stats)
+      };
+    }
+
+    function calculateCompositeScore(statMap) {
+      let weightedTotal = 0;
+      let totalWeight = 0;
+      COMPARISON_METRICS.forEach(metric => {
+        const range = comparisonMetricRanges[metric.key];
+        const raw = parseFloat(statMap[metric.key]);
+        if (!range || isNaN(raw) || range.max === range.min) return;
+        let normalizedValue = (raw - range.min) / (range.max - range.min);
+        if (metric.direction === 'asc') {
+          normalizedValue = 1 - normalizedValue;
+        }
+        weightedTotal += normalizedValue * metric.weight;
+        totalWeight += metric.weight;
+      });
+      return totalWeight ? weightedTotal / totalWeight : 0;
+    }
+
+    function renderComparison() {
+      const leftProfile = buildComparisonProfile(comparisonSelections.left);
+      const rightProfile = buildComparisonProfile(comparisonSelections.right);
+      let winningSide = 'none';
+      if (leftProfile && rightProfile) {
+        const diff = leftProfile.score - rightProfile.score;
+        if (Math.abs(diff) < 0.001) {
+          winningSide = 'tie';
+        } else {
+          winningSide = diff > 0 ? 'left' : 'right';
+        }
+      }
+      renderComparisonCard('left', leftProfile, winningSide);
+      renderComparisonCard('right', rightProfile, winningSide);
+      renderComparisonSummary(leftProfile, rightProfile, winningSide);
+      renderComparisonTable(leftProfile, rightProfile);
+    }
+
+    function renderComparisonCard(side, profile, winningSide) {
+      const card = document.getElementById(`player-compare-${side}-card`);
+      const body = document.getElementById(`player-compare-${side}-body`);
+      if (!card || !body) return;
+      card.classList.remove('comparison-panel--leader');
+
+      if (!profile) {
+        body.innerHTML = `<p class="text-sm text-gray-500">Waiting for a player selection...</p>`;
+        return;
+      }
+
+      if (winningSide === side || winningSide === 'tie') {
+        card.classList.add('comparison-panel--leader');
+      }
+
+      const quickStatKeys = ['FPts', 'FP/G', 'G', 'A'];
+      const quickStats = quickStatKeys
+        .map(metricKey => {
+          if (profile.stats[metricKey] === undefined) return '';
+          return `<div><span>${metricKey}</span><span>${formatComparisonStat(profile.stats[metricKey])}</span></div>`;
+        })
+        .filter(Boolean)
+        .join('');
+
+      body.innerHTML = `
+        <div>
+          <p class="text-xl font-semibold">${profile.label}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">${profile.team || '—'} • ${profile.position || '—'}</p>
+          <p class="text-xs text-gray-400 uppercase tracking-wide">${profile.status || 'Unassigned'}</p>
+        </div>
+        <div class="mt-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Composite Impact Score</p>
+          <p class="text-3xl font-bold">${(profile.score * 100).toFixed(1)}</p>
+        </div>
+        <div class="comparison-panel-quickstats">
+          ${quickStats}
+        </div>
+      `;
+    }
+
+    function renderComparisonSummary(leftProfile, rightProfile, winningSide) {
+      const summary = document.getElementById('player-compare-summary');
+      if (!summary) return;
+
+      if (!leftProfile || !rightProfile) {
+        summary.classList.remove('comparison-panel--leader');
+        summary.innerHTML = `
+          <p class="text-sm text-gray-500">Composite Comparison Engine</p>
+          <p class="text-lg font-semibold mt-2">Pick two players</p>
+          <p class="text-xs text-gray-400 mt-4">
+            The weighted model adapts to ${comparisonContextLabel || 'the current view'} to quantify trade value instantly.
+          </p>
+        `;
+        return;
+      }
+
+      const diff = leftProfile.score - rightProfile.score;
+      const leader =
+        Math.abs(diff) < 0.001 ? null : diff > 0 ? leftProfile : rightProfile;
+      const leaderClass = !leader
+        ? 'text-gray-500'
+        : leader === leftProfile
+          ? 'text-blue-500'
+          : 'text-pink-500';
+
+      summary.classList.add('comparison-panel--leader');
+      summary.innerHTML = `
+        <p class="text-sm text-gray-500">Composite Impact (${comparisonContextLabel || 'Current View'})</p>
+        <div class="text-4xl font-bold mt-3">
+          ${(leftProfile.score * 100).toFixed(1)}
+          <span class="text-base text-gray-400 mx-2">vs</span>
+          ${(rightProfile.score * 100).toFixed(1)}
+        </div>
+        <p class="text-sm font-semibold mt-3 ${leaderClass}">
+          ${leader ? `${leader.label} favored by ${formatDifference(Math.abs(diff * 100))}` : 'Dead even'}
+        </p>
+        <p class="text-xs text-gray-500 mt-2">
+          Scores weight FPTS, FP/G, Goals, Assists, Clean Sheets, Saves, GA and Minutes.
+        </p>
+      `;
+    }
+
+    function renderComparisonTable(leftProfile, rightProfile) {
+      const tbody = document.getElementById('player-compare-table-body');
+      if (!tbody) return;
+
+      if (!leftProfile || !rightProfile) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="py-4 text-center text-gray-500">
+              Select two players above to reveal the head-to-head math.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = COMPARISON_METRICS.map(metric => {
+        const leftValue = parseFloat(leftProfile.stats[metric.key]) || 0;
+        const rightValue = parseFloat(rightProfile.stats[metric.key]) || 0;
+        const leftDisplay = formatComparisonStat(leftValue);
+        const rightDisplay = formatComparisonStat(rightValue);
+        const difference = Math.abs(leftValue - rightValue);
+        let edgeLabel = 'Even';
+        let edgeClass = 'text-gray-500';
+
+        if (difference >= 0.01) {
+          const leftBetter = metric.direction === 'asc' ? leftValue < rightValue : leftValue > rightValue;
+          const leaderName = leftBetter ? leftProfile.label : rightProfile.label;
+          const qualifier = metric.direction === 'asc' ? 'lower' : 'higher';
+          edgeLabel = `${leaderName} ${qualifier} by ${formatDifference(difference)}`;
+          edgeClass = leftBetter ? 'text-blue-500' : 'text-pink-500';
+        }
+
+        return `
+          <tr class="border-b border-gray-200 dark:border-gray-700">
+            <td class="py-2">${metric.label}</td>
+            <td class="py-2">${leftDisplay}</td>
+            <td class="py-2">${rightDisplay}</td>
+            <td class="py-2 font-semibold ${edgeClass}">${edgeLabel}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function formatComparisonStat(value) {
+      const num = parseFloat(value);
+      if (isNaN(num)) {
+        return value || '—';
+      }
+      if (Math.abs(num) >= 100) return num.toFixed(0);
+      if (Math.abs(num) >= 10) return num.toFixed(1);
+      if (Math.abs(num) >= 1) return num.toFixed(2);
+      return num.toFixed(3);
+    }
+
+    function formatDifference(value) {
+      const num = Math.abs(value);
+      if (num >= 100) return num.toFixed(0);
+      if (num >= 10) return num.toFixed(1);
+      if (num >= 1) return num.toFixed(2);
+      return num.toFixed(3);
+    }
 
     function updatePlayerView() {
       const selectedGW = document.getElementById('gameweek-selector').value;
@@ -1667,6 +2114,7 @@
         ['total-players', 'top-scorer-name', 'avg-points'].forEach(id => document.getElementById(id).innerText = 'N/A');
         document.getElementById('top-scorer-pts').innerText = '-- FPts';
         if ($.fn.DataTable.isDataTable('#players-table')) { $('#players-table').DataTable().clear().draw(); }
+        updateComparisonDataset([], statsViewType, selectedGW);
       } else {
         document.getElementById('total-players').innerText = sourceData.length;
         const topScorer = sourceData.reduce((a, b) => (parseFloat(a["FPts"] || 0) > parseFloat(b["FPts"] || 0)) ? a : b, { Player: 'N/A', FPts: 0 });
@@ -1684,8 +2132,11 @@
                 ? row[col]
                 : 0;
           });
+          normalized.__playerKey = normalizeName(normalized.Player);
           return normalized;
         });
+
+        updateComparisonDataset(normalizedData, statsViewType, selectedGW);
 
         if ($.fn.DataTable.isDataTable('#players-table')) {
           $('#players-table').DataTable().destroy();
@@ -1788,6 +2239,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       updateTradeImpactViewButtons();
+      setupComparisonInputs();
       const filesToLoad = ['record.csv', 'transactions.csv', 'trades.csv', 'team_mapping.csv', 'draft_result.csv'];
       for (let i = 1; i <= MAX_GAMEWEEK; i++) {
         filesToLoad.push(`ref_gw${i}.csv`);
@@ -2239,6 +2691,56 @@
 
     .dashboard-table tbody tr:last-child td {
       border-bottom: none;
+    }
+
+    .comparison-panel {
+      border: 1px solid var(--ui-border);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      background-color: rgba(255, 255, 255, 0.95);
+      min-height: 220px;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    [data-theme="dark"] .comparison-panel {
+      background-color: rgba(15, 23, 42, 0.85);
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.6);
+    }
+
+    .comparison-panel-body {
+      margin-top: 1rem;
+      min-height: 140px;
+    }
+
+    .comparison-panel--summary {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .comparison-panel--leader {
+      border-color: var(--ui-accent);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+    }
+
+    [data-theme="dark"] .comparison-panel--leader {
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.45);
+    }
+
+    .comparison-panel-quickstats {
+      margin-top: 1rem;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .comparison-panel-quickstats div {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--ui-card-subtext);
     }
 
     .dashboard-table .text-green-500,
