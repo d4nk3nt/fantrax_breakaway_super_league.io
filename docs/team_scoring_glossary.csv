@@ -1,0 +1,95 @@
+﻿Abbrev,Full Name,Description,Update
+6S:,6 Second Violations,6 Second Violations,Live
+AC:,Accurate Crosses,"An accurate pass from a wide position (via corners, open plays and set pieces) into a specific area in front of the goal. The pass must be touched next by a teammate of the crossing player.",Live
+AP:,Accurate Passes,All accurate passes (excluding crosses),Live
+A:,Assists (Official),"An official assist, as tracked by the official Premier League site. Fantasy assists (e.g. assists from rebounds) do not count.",Live
+A2:,Assists (Second),"If there was a 2nd assist, i.e a pass to create the opportunity for the player making the assist",Live
+ABS:,Assists from Blocked Shots,A shot blocked by a defender and scored on the rebound.,Live
+AFKG:,Assists from Free Kick Goals,A foul won that leads to a direct free kick scored.,Live
+AHW:,Assists from Handballs Won,A player forces a handball which results in a free kick scored.,Live
+AOG:,Assists from Own Goal,"A player shoots or passes, forcing a defender to put the ball in his own goal.",Live
+APL:,Assists from Passes Lost,A heavily deflected pass.,Live
+APKG:,Assists from Penalty Kick Goals,An assist assigned to a player who wins a penalty which is taken and scored by a teammate.,Live
+AR:,Assists from Rebounds,A shot saved by the goalkeeper but scored on the rebound.,Live
+ASOP:,Assists from Shots Off Post,A shot that hits the post and is scored on the rebound.,Live
+BCC:,Big Chances Created,"Passes which led to a clear cut scoring opportunity, e.g. one-on-one situation or a shot from just a few yards out.",Live
+BCM:,Big Chances Missed,Clear cut scoring opportunities which were not converted/scored.,Live
+BCS:,Big Chances Scored,Goals scored which were a clear cut chance,Live
+BC:,Blocked Crosses,A cross blocked by the defender,Live
+BS:,Blocked Shots,"Any goal attempt heading roughly on target toward goal which is blocked by a defender, where there are other defenders or a goalkeeper behind the blocker.",Live
+CmA:,Claims Attempted,Goalkeeper attempts to claim the ball,Live
+CLS:,Claims Succeeded,Claims made by the goalkeeper,Live
+CS:,Clean Sheets,Awarded to a player who played at least 60 minutes and whose team gave up 0 goals that game.,Live
+CSA:,Clean Sheets Against,Clean Sheets Against,Live
+CLRA:,Clearances Attempted,Total number of clearances attempted,Live
+CoA:,Contests Attempted,"A dribble past a player attempted (contests always involve 2 players) - doesn't include ""overrun"" situations where the attacking player takes on an opponent but the ball runs away from them out of play or to an opponent",Live
+CK:,Corner Kicks,Total corners taken (including short corners),Live
+CC:,Corners Conceded,Total corners conceded by the defensive player/team,Live
+CF:,Corners Forced,Total corners forced by the offensive player/team,Live
+C:,Crosses,Total crosses attempted,Live
+CF:,Crosses Failed,Crosses Attempted - Accurate Crosses,Live
+DP:,Dangerous Plays,Foul for play which could cause serious injury to an opponent,Live
+DPt:,Discipline Points,Fouls + (3 x Yellow Cards) + (6 x Red Cards),Live
+D:,Draws,Draws,Live
+CLR:,Effective Clearances,Successful defensive clearance - where player under pressure kicks the ball clear of the defensive zone and/or out of play,Live
+FC:,Fouls Committed,Fouls Committed,Live
+FC/G:,Fouls Committed Per Game,Fouls Committed Per Game,Live
+FS:,Fouls Suffered,Fouls Suffered,Live
+FS/G:,Fouls Suffered Per Game,Fouls Suffered Per Game,Live
+GP:,Games Played,Games Played,Live
+GSF:,Games Scored First,Games Scored First,Live
+Dif:,Goal Differential,Goal Differential,Live
+GA:,Goals Against,Goals conceded by the team while the goalkeeper was on the field. This only applies to the goalkeeper.,Live
+GAA:,Goals Against Average,Average Goals Against per Game,Live
+GAIB:,Goals Against Inside Box,Goal against from a shot inside the box,Live
+GAOB:,Goals Against Outside Box,Goal against from a shot outside the box,Live
+GF:,Goals For,Goals For,Live
+GF/G:,Goals For Per Game,Goals For Per Game,Live
+HB:,Hand Balls,Foul for handball,Live
+HT:,Hat Tricks,Player scores 3 goals in a game,Live
+Int:,Interceptions,Player intercepts a pass,Live
+IntB:,Interceptions in the Box,Interception made within the box,Live
+L:,Losses,"A loss by the player's team. The player only gets credit for the loss if he plays 60+ min, and is on his team's official Active roster or he is suspended.",Live
+Off:,Offsides,Offsides,Live
+Off/G:,Offsides Per Game,Offsides Per Game,Live
+OG:,Own Goals,Goals scored on own net,Live
+PA:,Passes Attempted,"Total attempted passes (excluding crosses, goal kicks, keeper throws and throw-ins)",Live
+P%:,Passing Percentage,Accurate Passes / Attempted Passes,Live
+PKG:,Penalty Kick Goals,Penalty Kick Goals,Live
+PKGA:,Penalty Kick Goals Against,Penalty Kick Goals Against,Live
+PKS:,Penalty Kick Saves,Number of penalty kicks saved by the goalkeeper,Live
+PKA:,Penalty Kicks Attempted,Number of penalty kicks taken by the shooter,Live
+PKD:,Penalty Kicks Drawn,Player fouled within the penalty box (excludes any penalty kicks drawn for handballs),Live
+PKF:,Penalty Kicks Faced,Number of penalty kicks faced by the goalkeeper,Live
+Pu:,Punches,Goalkeeper punches the ball clear from a high ball,Live
+RC:,Red Cards,"If a player receives a red card and then has his red card rescinded at a later time, his red card will remain (i.e. he will have credit for both a red card and a red card rescinded).",Live
+RCR:,Red Cards Rescinded,Red card rescinded by the referee,Live
+Sv%:,Save Percentage,Save Percentage,Live
+Sv:,Saves,Saves,Live
+SvIB:,Saves Inside the Box,Saves Inside the Box,Live
+SvOB:,Saves Outside the Box,Saves Outside the Box,Live
+SA:,Shooting Accuracy,Shots on Target / Shots,Live
+S:,Shots,Shots,Live
+SA:,Shots Against,"Any shot against the goalkeeper, whether or not it missed the net",Live
+SAIB:,Shots Against Inside Box,Any shot taken from inside the box,Live
+SAOB:,Shots Against Outside Box,Any shot taken from outside the box,Live
+SA/G:,Shots Against Per Game,Shots Against Per Game,Live
+SB:,Shots Blocked,Shots blocked (against the shooter),Live
+S/G:,Shots Per Game,Shots Per Game,Live
+SOP:,Shots off the Post,Shots off the Post,Live
+SOT:,Shots on Target,Shots on Target,Live
+STA:,Shots on Target Against,Shots on Target Against,Live
+STA/G:,Shots on Target Against Per Game,Shots on Target Against Per Game,Live
+SOT/G:,Shots on Target Per Game,Shots on Target Per Game,Live
+Sm:,Smothers,Smothers,Live
+Pts:,Standings Points,Standings Points,Live
+SBOF:,Substitutions Off,Substitutions Off,Live
+SBON:,Substitutions On,Substitutions On,Live
+CoS:,Successful Dribbles (Contests Succeeded),Total dribbles where a player beats an opponent - no overruns,Live
+SFTP:,Successful Final Third Passes,"Total successful passes where the ball ends in the final third of the pitch (excluding throw-ins, keeper throws, goal kicks and crosses).",Live
+Tk:,Tackles,Total tackle attempts,Live
+TkW:,Tackles Won,Total tackles won (winning possession or putting the ball out of play),Live
+Pos:,Time Of Possession %,Time Of Possession %,Live
+Pos:,Time Of Possession % Per Game,Time Of Possession % Per Game,Live
+W:,Wins,"A win by the player's team. The player only gets credit for the win if he plays 60+ min, and is on his team's official Active roster or he is suspended.",Live
+YC:,Yellow Cards,Yellow Cards,Live

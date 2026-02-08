@@ -209,6 +209,20 @@ Gameweek,Start_Date,End_Date,Team,Score,Opponent,Opp_Score
 15,Fri Dec 5 2025,Thu Dec 11 2025,"Me,Myself,Ndiaye",116.98,Book Ake,94.18
 15,Fri Dec 5 2025,Thu Dec 11 2025,Texas Chainshaw Massacre,120.26,FPL Loyalists,127.88
 15,Fri Dec 5 2025,Thu Dec 11 2025,Ugarte roll with it,107.49,*League Average*,123.218
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",*League Average*,113.203,Iwobi Wan-Kenobi,141.48
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Book Ake,106.07,I’m a Baleba,107.2
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Bryan MBeumboclaat,143.23,Ugarte roll with it,133.42
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Chicken Tikka MoSalah,97.08,ESRs EDL for FPL,104.14
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",ESRs EDL for FPL,104.14,Chicken Tikka MoSalah,97.08
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Ekitiki-taka,104.25,Infantino Milan,116.09
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",FPL Loyalists,95.92,Haile Senesi,108.24
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Haile Senesi,108.24,FPL Loyalists,95.92
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Infantino Milan,116.09,Ekitiki-taka,104.25
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Iwobi Wan-Kenobi,141.48,*League Average*,113.203
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",I’m a Baleba,107.2,Book Ake,106.07
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025","Me,Myself,Ndiaye",105.09,Texas Chainshaw Massacre,109.43
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Texas Chainshaw Massacre,109.43,"Me,Myself,Ndiaye",105.09
+16,"Fri Dec 12, 2025","Thu Dec 18, 2025",Ugarte roll with it,133.42,Bryan MBeumboclaat,143.23
 17,Fri Dec 19 2025,Thu Dec 25 2025,*League Average*,112.952,Infantino Milan,165.94
 17,Fri Dec 19 2025,Thu Dec 25 2025,Book Ake,85.86,Chicken Tikka MoSalah,85.25
 17,Fri Dec 19 2025,Thu Dec 25 2025,Bryan MBeumboclaat,101.0,Iwobi Wan-Kenobi,127.75
@@ -223,3 +237,115 @@ Gameweek,Start_Date,End_Date,Team,Score,Opponent,Opp_Score
 17,Fri Dec 19 2025,Thu Dec 25 2025,"Me,Myself,Ndiaye",125.29,I’m a Baleba,102.32
 17,Fri Dec 19 2025,Thu Dec 25 2025,Texas Chainshaw Massacre,108.76,Haile Senesi,121.13
 17,Fri Dec 19 2025,Thu Dec 25 2025,Ugarte roll with it,127.33,FPL Loyalists,133.73
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",*League Average*,115.945,ESRs EDL for FPL,147.42
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Book Ake,121.68,Ekitiki-taka,93.77
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Bryan MBeumboclaat,112.63,Infantino Milan,103.46
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Chicken Tikka MoSalah,97.91,I’m a Baleba,122.72
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",ESRs EDL for FPL,147.42,*League Average*,115.945
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Ekitiki-taka,93.77,Book Ake,121.68
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",FPL Loyalists,120.19,Iwobi Wan-Kenobi,130.91
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Haile Senesi,114.34,"Me,Myself,Ndiaye",91.94
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Infantino Milan,103.46,Bryan MBeumboclaat,112.63
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Iwobi Wan-Kenobi,130.91,FPL Loyalists,120.19
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",I’m a Baleba,122.72,Chicken Tikka MoSalah,97.91
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025","Me,Myself,Ndiaye",91.94,Haile Senesi,114.34
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Texas Chainshaw Massacre,125.48,Ugarte roll with it,124.83
+18,"Fri Dec 26, 2025","Sun Dec 28, 2025",Ugarte roll with it,124.83,Texas Chainshaw Massacre,125.48
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",*League Average*,110.372,Book Ake,113.63
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Book Ake,113.63,*League Average*,110.372
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Bryan MBeumboclaat,115.61,ESRs EDL for FPL,139.63
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Chicken Tikka MoSalah,126.66,"Me,Myself,Ndiaye",66.69
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",ESRs EDL for FPL,139.63,Bryan MBeumboclaat,115.61
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Ekitiki-taka,122.86,I’m a Baleba,76.63
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",FPL Loyalists,95.29,Infantino Milan,120.68
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Haile Senesi,125.57,Ugarte roll with it,139.27
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Infantino Milan,120.68,FPL Loyalists,95.29
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Iwobi Wan-Kenobi,133.43,Texas Chainshaw Massacre,58.88
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",I’m a Baleba,76.63,Ekitiki-taka,122.86
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026","Me,Myself,Ndiaye",66.69,Chicken Tikka MoSalah,126.66
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Texas Chainshaw Massacre,58.88,Iwobi Wan-Kenobi,133.43
+19,"Mon Dec 29, 2025","Thu Jan 1, 2026",Ugarte roll with it,139.27,Haile Senesi,125.57
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",*League Average*,107.743,I’m a Baleba,71.97
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Book Ake,77.39,Bryan MBeumboclaat,100.85
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Bryan MBeumboclaat,100.85,Book Ake,77.39
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Chicken Tikka MoSalah,90.88,Ekitiki-taka,143.31
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",ESRs EDL for FPL,132.11,FPL Loyalists,154.82
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Ekitiki-taka,143.31,Chicken Tikka MoSalah,90.88
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",FPL Loyalists,154.82,ESRs EDL for FPL,132.11
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Haile Senesi,93.18,Iwobi Wan-Kenobi,131.43
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Infantino Milan,99.08,Texas Chainshaw Massacre,78.24
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Iwobi Wan-Kenobi,131.43,Haile Senesi,93.18
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",I’m a Baleba,71.97,*League Average*,107.743
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026","Me,Myself,Ndiaye",107.89,Ugarte roll with it,119.51
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Texas Chainshaw Massacre,78.24,Infantino Milan,99.08
+20,"Fri Jan 2, 2026","Mon Jan 5, 2026",Ugarte roll with it,119.51,"Me,Myself,Ndiaye",107.89
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",*League Average*,112.266,Chicken Tikka MoSalah,144.26
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Book Ake,149.84,FPL Loyalists,101.41
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Bryan MBeumboclaat,111.17,I’m a Baleba,99.77
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Chicken Tikka MoSalah,144.26,*League Average*,112.266
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",ESRs EDL for FPL,108.37,Texas Chainshaw Massacre,99.17
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Ekitiki-taka,157.44,"Me,Myself,Ndiaye",94.03
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",FPL Loyalists,101.41,Book Ake,149.84
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Haile Senesi,81.68,Infantino Milan,101.39
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Infantino Milan,101.39,Haile Senesi,81.68
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Iwobi Wan-Kenobi,114.02,Ugarte roll with it,96.91
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",I’m a Baleba,99.77,Bryan MBeumboclaat,111.17
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026","Me,Myself,Ndiaye",94.03,Ekitiki-taka,157.44
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Texas Chainshaw Massacre,99.17,ESRs EDL for FPL,108.37
+21,"Tue Jan 6, 2026","Thu Jan 15, 2026",Ugarte roll with it,96.91,Iwobi Wan-Kenobi,114.02
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",*League Average*,111.425,Ekitiki-taka,105.18
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Book Ake,109.24,Texas Chainshaw Massacre,125.28
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Bryan MBeumboclaat,125.43,Chicken Tikka MoSalah,128.66
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Chicken Tikka MoSalah,128.66,Bryan MBeumboclaat,125.43
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",ESRs EDL for FPL,143.57,Haile Senesi,124.65
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Ekitiki-taka,105.18,*League Average*,111.425
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",FPL Loyalists,92.36,I’m a Baleba,94.37
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Haile Senesi,124.65,ESRs EDL for FPL,143.57
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Infantino Milan,80.86,Ugarte roll with it,128.65
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Iwobi Wan-Kenobi,86.11,"Me,Myself,Ndiaye",104.17
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",I’m a Baleba,94.37,FPL Loyalists,92.36
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026","Me,Myself,Ndiaye",104.17,Iwobi Wan-Kenobi,86.11
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Texas Chainshaw Massacre,125.28,Book Ake,109.24
+22,"Fri Jan 16, 2026","Thu Jan 22, 2026",Ugarte roll with it,128.65,Infantino Milan,80.86
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",*League Average*,103.145,"Me,Myself,Ndiaye",89.18
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Book Ake,97.66,Haile Senesi,121.07
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Bryan MBeumboclaat,98.48,Ekitiki-taka,88.47
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Chicken Tikka MoSalah,75.22,FPL Loyalists,152.57
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",ESRs EDL for FPL,112.14,Ugarte roll with it,109.46
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Ekitiki-taka,88.47,Bryan MBeumboclaat,98.48
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",FPL Loyalists,152.57,Chicken Tikka MoSalah,75.22
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Haile Senesi,121.07,Book Ake,97.66
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Infantino Milan,72.16,Iwobi Wan-Kenobi,106.05
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Iwobi Wan-Kenobi,106.05,Infantino Milan,72.16
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",I’m a Baleba,102.12,Texas Chainshaw Massacre,116.31
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026","Me,Myself,Ndiaye",89.18,*League Average*,103.145
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Texas Chainshaw Massacre,116.31,I’m a Baleba,102.12
+23,"Fri Jan 23, 2026","Thu Jan 29, 2026",Ugarte roll with it,109.46,ESRs EDL for FPL,112.14
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",*League Average*,112.292,Bryan MBeumboclaat,120.36
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Book Ake,118.4,Ugarte roll with it,94.44
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Bryan MBeumboclaat,120.36,*League Average*,112.292
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Chicken Tikka MoSalah,104.17,Texas Chainshaw Massacre,135.66
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",ESRs EDL for FPL,77.92,Iwobi Wan-Kenobi,103.77
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Ekitiki-taka,120.2,FPL Loyalists,96.09
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",FPL Loyalists,96.09,Ekitiki-taka,120.2
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Haile Senesi,146.54,I’m a Baleba,129.54
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Infantino Milan,114.68,"Me,Myself,Ndiaye",98.02
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Iwobi Wan-Kenobi,103.77,ESRs EDL for FPL,77.92
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",I’m a Baleba,129.54,Haile Senesi,146.54
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026","Me,Myself,Ndiaye",98.02,Infantino Milan,114.68
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Texas Chainshaw Massacre,135.66,Chicken Tikka MoSalah,104.17
+24,"Fri Jan 30, 2026","Thu Feb 5, 2026",Ugarte roll with it,94.44,Book Ake,118.4
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",*League Average*,113.925,FPL Loyalists,119.11
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Book Ake,109.27,Iwobi Wan-Kenobi,116.4
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Bryan MBeumboclaat,133.45,"Me,Myself,Ndiaye",136.53
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Chicken Tikka MoSalah,92.39,Haile Senesi,148.79
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",ESRs EDL for FPL,134.42,Infantino Milan,114.75
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Ekitiki-taka,119.1,Texas Chainshaw Massacre,91.72
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",FPL Loyalists,119.11,*League Average*,113.925
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Haile Senesi,148.79,Chicken Tikka MoSalah,92.39
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Infantino Milan,114.75,ESRs EDL for FPL,134.42
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Iwobi Wan-Kenobi,116.4,Book Ake,109.27
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",I’m a Baleba,91.23,Ugarte roll with it,73.87
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026","Me,Myself,Ndiaye",136.53,Bryan MBeumboclaat,133.45
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Texas Chainshaw Massacre,91.72,Ekitiki-taka,119.1
+25,"Fri Feb 6, 2026","Mon Feb 9, 2026",Ugarte roll with it,73.87,I’m a Baleba,91.23
